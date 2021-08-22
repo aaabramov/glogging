@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.github.aaabramov</groupId>
+    <groupId>io.github.aaabramov</groupId>
     <artifactId>glogging</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
@@ -16,7 +16,7 @@
   <dependencies>
 
     <dependency>
-      <groupId>com.github.aaabramov</groupId>
+      <groupId>io.github.aaabramov</groupId>
       <artifactId>glogging-core</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>

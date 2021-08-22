@@ -1,4 +1,4 @@
-package com.github.aaabramov.glogging;
+package io.github.aaabramov.glogging;
 
 interface JsonEncoder {
     

@@ -1,10 +1,10 @@
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="com.github.aaabramov.glogging.GoogleLayout">
-                <json>com.github.aaabramov.glogging.JacksonEncoder</json>
+            <layout class="io.github.aaabramov.glogging.GoogleLayout">
+                <json>io.github.aaabramov.glogging.JacksonEncoder</json>
                 <appendLoggerName>true</appendLoggerName>
-                <prefix>com.github.aaabramov</prefix>
+                <prefix>io.github.aaabramov</prefix>
                 <pattern>%message %xException{10}</pattern>
             </layout>
         </encoder>

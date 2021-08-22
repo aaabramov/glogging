@@ -21,10 +21,10 @@ See [structured logs](https://cloud.google.com/logging/docs/structured-logging).
 <configuration>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="com.github.aaabramov.glogging.GoogleLayout">
+            <layout class="io.github.aaabramov.glogging.GoogleLayout">
                 <!-- You have a choice with JSON encoder to use. Or create your own via implementing JsonEncoder interface -->
-                <json>com.github.aaabramov.glogging.JacksonEncoder</json>
-                <!-- <json>com.github.aaabramov.glogging.GsonEncoder</json> -->
+                <json>io.github.aaabramov.glogging.JacksonEncoder</json>
+                <!-- <json>io.github.aaabramov.glogging.GsonEncoder</json> -->
                 <!-- Optionally append "${prefix}/loggerName" labels -->
                 <appendLoggerName>true</appendLoggerName>
                 <!-- Optionally configure prefix for labels -->
@@ -52,12 +52,12 @@ See [structured logs](https://cloud.google.com/logging/docs/structured-logging).
 ## Example output:
 
 ```
-{"timestamp":{"seconds":1629642099,"nanos":659000000},"severity":"DEBUG","message":"debug","labels":{"com.github.aaabramov/name":"Andrii","com.github.aaabramov/loggerName":"com.github.aaabramov.glogging.App"}}
-{"timestamp":{"seconds":1629642099,"nanos":659000000},"severity":"INFO","message":"info","labels":{"com.github.aaabramov/name":"Andrii","com.github.aaabramov/loggerName":"com.github.aaabramov.glogging.App"}}
-{"timestamp":{"seconds":1629642099,"nanos":659000000},"severity":"WARN","message":"warn","labels":{"com.github.aaabramov/name":"Andrii","com.github.aaabramov/loggerName":"com.github.aaabramov.glogging.App"}}
-{"timestamp":{"seconds":1629642099,"nanos":661000000},"severity":"ERROR","message":"error java.lang.RuntimeException: BOOM\n\tat com.github.aaabramov.glogging.App.main(App.java:22)","labels":{"com.github.aaabramov/name":"Andrii","com.github.aaabramov/loggerName":"com.github.aaabramov.glogging.App"}}
-{"timestamp":{"seconds":1629642102,"nanos":661000000},"severity":"DEBUG","message":"debug","labels":{"com.github.aaabramov/name":"Andrii","com.github.aaabramov/loggerName":"com.github.aaabramov.glogging.App"}}
-{"timestamp":{"seconds":1629642102,"nanos":661000000},"severity":"INFO","message":"info","labels":{"com.github.aaabramov/name":"Andrii","com.github.aaabramov/loggerName":"com.github.aaabramov.glogging.App"}}
-{"timestamp":{"seconds":1629642102,"nanos":661000000},"severity":"WARN","message":"warn","labels":{"com.github.aaabramov/name":"Andrii","com.github.aaabramov/loggerName":"com.github.aaabramov.glogging.App"}}
-{"timestamp":{"seconds":1629642102,"nanos":661000000},"severity":"ERROR","message":"error","labels":{"com.github.aaabramov/name":"Andrii","com.github.aaabramov/loggerName":"com.github.aaabramov.glogging.App"}}
+{"timestamp":{"seconds":1629642099,"nanos":659000000},"severity":"DEBUG","message":"debug","labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
+{"timestamp":{"seconds":1629642099,"nanos":659000000},"severity":"INFO","message":"info","labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
+{"timestamp":{"seconds":1629642099,"nanos":659000000},"severity":"WARN","message":"warn","labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
+{"timestamp":{"seconds":1629642099,"nanos":661000000},"severity":"ERROR","message":"error java.lang.RuntimeException: BOOM\n\tat io.github.aaabramov.glogging.App.main(App.java:22)","labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
+{"timestamp":{"seconds":1629642102,"nanos":661000000},"severity":"DEBUG","message":"debug","labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
+{"timestamp":{"seconds":1629642102,"nanos":661000000},"severity":"INFO","message":"info","labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
+{"timestamp":{"seconds":1629642102,"nanos":661000000},"severity":"WARN","message":"warn","labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
+{"timestamp":{"seconds":1629642102,"nanos":661000000},"severity":"ERROR","message":"error","labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
 ```

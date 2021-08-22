@@ -3,12 +3,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.aaabramov</groupId>
+    <groupId>io.github.aaabramov</groupId>
     <artifactId>glogging</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
+
     <name>glogging</name>
+    <description>Logback layout for Google Structured logging</description>
     <url>https://github.com/aaabramov/googe-logging-layout</url>
+
+    <organization>
+        <url>https://github.com/aaabramov</url>
+        <name>Andrii Abramov</name>
+    </organization>
 
     <licenses>
         <license>
