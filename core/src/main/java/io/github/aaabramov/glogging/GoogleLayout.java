@@ -40,6 +40,8 @@ public class GoogleLayout extends PatternLayout {
     private String prefix;
     /**
      * JSON encoder implementation to use.
+     *
+     * @see JsonEncoder
      */
     private String json;
     /**
