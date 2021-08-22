@@ -3,7 +3,7 @@
 ## Why?
 
 - Google indexes logs - easies and faster to filter logs.
-  See [feedbackUsing the Logs Explorer](https://cloud.google.com/logging/docs/view/logs-viewer-interface)
+  See [Using the Logs Explorer](https://cloud.google.com/logging/docs/view/logs-viewer-interface)
 - Aggregating logs by labels
 - Log metrics
 - Proper logging levels in the UI
