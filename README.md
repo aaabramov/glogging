@@ -12,7 +12,47 @@ See [structured logs](https://cloud.google.com/logging/docs/structured-logging).
 
 ## Getting started
 
-**TODO**
+Maven:
+
+```xml
+
+<dependencies>
+    <dependency>
+        <groupId>io.github.aaabramov</groupId>
+        <artifactId>glogging-core</artifactId>
+        <version>0.0.1</version>
+    </dependency>
+
+
+    <dependency>
+        <groupId>io.github.aaabramov</groupId>
+        <artifactId>glogging-gson</artifactId>
+        <!-- Or -->
+        <!--<artifactId>glogging-jackson</artifactId>-->
+        <version>0.0.1</version>
+    </dependency>
+</dependencies>
+```
+
+Gradle:
+
+```groovy
+implementation 'io.github.aaabramov:glogging-core:0.0.1'
+implementation 'io.github.aaabramov:glogging-gson:0.0.1'
+// OR 
+// implementation 'io.github.aaabramov:glogging-jackson:0.0.1'
+```
+
+Sbt:
+
+```sbt
+libraryDependencies ++= Seq(
+  "io.github.aaabramov" % "glogging-core",
+  "io.github.aaabramov" % "glogging-gson"
+  //  OR
+  //  "io.github.aaabramov" % "glogging-jackson"
+).map(_ % "0.0.1")
+```
 
 ## Configuration example:
 
