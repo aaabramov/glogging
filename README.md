@@ -111,5 +111,7 @@ libraryDependencies ++= Seq(
 ## Releasing
 
 ```bash
+mvn versions:set -DnewVersion=X.Y.Z
+mvn versions:commit
 mvn clean javadoc:jar source:jar verify gpg:sign deploy
 ```
