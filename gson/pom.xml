@@ -9,7 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>gson</artifactId>
+    <artifactId>glogging-gson</artifactId>
 
     <name>gson</name>
 

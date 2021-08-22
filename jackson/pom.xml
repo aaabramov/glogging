@@ -9,7 +9,7 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>jackson</artifactId>
+  <artifactId>glogging-jackson</artifactId>
 
   <name>jackson</name>
 
