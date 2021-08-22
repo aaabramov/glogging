@@ -7,6 +7,7 @@
 - Aggregating logs by labels
 - Log metrics
 - Proper logging levels in the UI
+- See [this StackOverflow](https://stackoverflow.com/q/44164730/5091346) question
 
 See [structured logs](https://cloud.google.com/logging/docs/structured-logging).
 
