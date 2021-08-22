@@ -25,12 +25,24 @@
         </license>
     </licenses>
 
+    <developers>
+        <developer>
+            <name>Andrii Abramov</name>
+            <organizationUrl>https://github.com/aaabramov</organizationUrl>
+        </developer>
+    </developers>
+
     <scm>
         <connection>scm:git:git://github.com/aaabramov/glogging.git</connection>
         <developerConnection>scm:git:git@github.com:aaabramov/glogging.git</developerConnection>
         <url>https://github.com/aaabramov/glogging</url>
         <tag>HEAD</tag>
     </scm>
+
+    <issueManagement>
+        <system>Github</system>
+        <url>https://github.com/aaabramov/glogging/issues</url>
+    </issueManagement>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
