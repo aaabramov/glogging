@@ -2,6 +2,9 @@ package io.github.aaabramov.glogging;
 
 /**
  * Represents timestamp as a combination of seconds & nanos.
+ *
+ * @author Andrii Abramov
+ * @since 0.0.1
  */
 class GcpTimestamp {
     

@@ -28,7 +28,9 @@ import java.util.Map;
  * }
  * </pre>
  *
+ * @author Andrii Abramov
  * @see <a href="https://cloud.google.com/logging/docs/structured-logging">Structured logging</a>
+ * @since 0.0.1
  */
 public class GoogleLayout extends PatternLayout {
     

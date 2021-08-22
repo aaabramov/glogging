@@ -27,7 +27,7 @@ Maven:
     <dependency>
         <groupId>io.github.aaabramov</groupId>
         <artifactId>glogging-gson</artifactId>
-        <!-- Or -->
+        <!-- OR -->
         <!--<artifactId>glogging-jackson</artifactId>-->
         <version>0.0.1</version>
     </dependency>
@@ -62,13 +62,19 @@ libraryDependencies ++= Seq(
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
             <layout class="io.github.aaabramov.glogging.GoogleLayout">
-                <!-- You have a choice with JSON encoder to use. Or create your own via implementing JsonEncoder interface -->
+
+                <!-- You have a choice which JSON encoder to use. Or create your own via implementing JsonEncoder interface -->
                 <json>io.github.aaabramov.glogging.JacksonEncoder</json>
+
+                <!-- OR -->
                 <!-- <json>io.github.aaabramov.glogging.GsonEncoder</json> -->
+
                 <!-- Optionally append "${prefix}/loggerName" labels -->
                 <appendLoggerName>true</appendLoggerName>
+
                 <!-- Optionally configure prefix for labels -->
                 <prefix>com.yourcompany</prefix>
+
                 <!-- Provide message pattern you like. -->
                 <!-- Note: there is no need anymore to log timestamps & levels to the message. Google will pick them up from specific fields. -->
                 <pattern>%message %xException{10}</pattern>
@@ -102,7 +108,7 @@ libraryDependencies ++= Seq(
 {"timestamp":{"seconds":1629642102,"nanos":661000000},"severity":"ERROR","message":"error","labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
 ```
 
-## Release
+## Releasing
 
 ```bash
 mvn clean javadoc:jar source:jar verify gpg:sign deploy

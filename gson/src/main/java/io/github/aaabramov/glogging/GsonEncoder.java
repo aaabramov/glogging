@@ -4,6 +4,9 @@ import com.google.gson.Gson;
 
 /**
  * Encode {@link GcpLoggingEvent} using Gson library.
+ *
+ * @author Andrii Abramov
+ * @since 0.0.1
  */
 public class GsonEncoder implements JsonEncoder {
     

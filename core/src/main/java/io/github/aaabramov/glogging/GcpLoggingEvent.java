@@ -3,6 +3,12 @@ package io.github.aaabramov.glogging;
 import java.util.Map;
 import java.util.StringJoiner;
 
+/**
+ * Represents logging event to be picked up by GCP logging collector.
+ *
+ * @author Andrii Abramov
+ * @since 0.0.1
+ */
 class GcpLoggingEvent {
     
     public final GcpTimestamp timestamp;
