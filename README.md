@@ -61,3 +61,9 @@ See [structured logs](https://cloud.google.com/logging/docs/structured-logging).
 {"timestamp":{"seconds":1629642102,"nanos":661000000},"severity":"WARN","message":"warn","labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
 {"timestamp":{"seconds":1629642102,"nanos":661000000},"severity":"ERROR","message":"error","labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
 ```
+
+## Release
+
+```bash
+mvn clean javadoc:jar source:jar verify gpg:sign deploy
+```

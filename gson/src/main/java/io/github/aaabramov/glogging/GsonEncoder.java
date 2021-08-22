@@ -5,7 +5,7 @@ import com.google.gson.Gson;
 /**
  * Encode {@link GcpLoggingEvent} using Gson library.
  */
-class GsonEncoder implements JsonEncoder {
+public class GsonEncoder implements JsonEncoder {
     
     private final Gson gson = new Gson();
     

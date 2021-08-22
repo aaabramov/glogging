@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * Encode {@link GcpLoggingEvent} using Jackson library.
  */
-class JacksonEncoder implements JsonEncoder {
+public class JacksonEncoder implements JsonEncoder {
     
     private final ObjectMapper objectMapper = new ObjectMapper();
     
