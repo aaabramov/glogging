@@ -21,7 +21,7 @@ import java.util.Map;
  *   "severity": "WARN",
  *   "message": "Formatted tests message (you define the format as usual)",
  *   "labels": {
- *     "your.custom.prefix/loggerName": "com.github.aaabramov.TestApplication",
+ *     "your.custom.prefix/loggerName": "io.github.aaabramov.TestApplication",
  *     "your.custom.prefix/userId": "2223123"
  *   }
  * }
@@ -124,7 +124,7 @@ public class GoogleLayout extends PatternLayout {
         StatusManager sm = this.getContext().getStatusManager();
         sm.add(
                 new ErrorStatus(
-                        s + "Specify on of: [com.github.aaabramov.glogging.GsonEncoder, TODO]",
+                        s + "Specify on of: [io.github.aaabramov.glogging.GsonEncoder, TODO]",
                         this
                 )
         );
