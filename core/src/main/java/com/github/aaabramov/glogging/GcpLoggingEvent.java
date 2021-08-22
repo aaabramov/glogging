@@ -1,6 +1,7 @@
 package com.github.aaabramov.glogging;
 
 import java.util.Map;
+import java.util.StringJoiner;
 
 class GcpLoggingEvent {
     
@@ -21,4 +22,13 @@ class GcpLoggingEvent {
         this.labels = labels;
     }
     
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", GcpLoggingEvent.class.getSimpleName() + "[", "]")
+                .add("timestamp=" + timestamp)
+                .add("severity='" + severity + "'")
+                .add("message='" + message + "'")
+                .add("labels=" + labels)
+                .toString();
+    }
 }

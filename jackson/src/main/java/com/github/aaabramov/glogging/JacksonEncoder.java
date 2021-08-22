@@ -16,8 +16,7 @@ class JacksonEncoder implements JsonEncoder {
         try {
             return this.objectMapper.writeValueAsString(event);
         } catch (JsonProcessingException e) {
-            // TODO
-            return "{\"message\": \"" + event.message + "\"}";
+            return "Error occurred during event serialization using jackson: " + e + ". Original event: " + event;
         }
     }
     
