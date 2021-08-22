@@ -9,11 +9,10 @@ package io.github.aaabramov.glogging;
 public interface JsonEncoder {
     
     /**
-     * Serialize {@link GcpLoggingEvent}s into JSON.
+     * Serialize {@link GcpLoggingEvent}s into JSON. camelCase <b>must</b> be used.
      *
      * @param event packaged logging event to serialize
      * @return JSON string without trailing newline
-     * @implSpec camelCase <b>must</b> be used.
      * @author Andrii Abramov
      * @since 0.0.1
      */
