@@ -10,7 +10,7 @@
 
     <name>glogging</name>
     <description>Logback layout for Google Structured logging</description>
-    <url>https://github.com/aaabramov/googe-logging-layout</url>
+    <url>https://github.com/aaabramov/glogging</url>
 
     <organization>
         <url>https://github.com/aaabramov</url>
@@ -26,7 +26,10 @@
     </licenses>
 
     <scm>
-        <url>https://github.com/aaabramov/googe-logging-layout.git</url>
+        <connection>scm:git:git://github.com/aaabramov/glogging.git</connection>
+        <developerConnection>scm:git:git@github.com:aaabramov/glogging.git</developerConnection>
+        <url>https://github.com/aaabramov/glogging</url>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
