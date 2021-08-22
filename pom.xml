@@ -4,7 +4,7 @@
 
     <groupId>io.github.aaabramov</groupId>
     <artifactId>glogging</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <packaging>pom</packaging>
 
     <name>glogging</name>
@@ -35,7 +35,8 @@
         <connection>scm:git:https://github.com/aaabramov/glogging</connection>
         <developerConnection>scm:git:https://github.com/aaabramov/glogging</developerConnection>
         <url>https://github.com/aaabramov/glogging</url>
-    </scm>
+      <tag>glogging-0.0.1</tag>
+  </scm>
 
     <issueManagement>
         <system>Github</system>
