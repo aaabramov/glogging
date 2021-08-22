@@ -1,0 +1,22 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.github.aaabramov.glogging.GoogleLayout">
+                <json>com.github.aaabramov.glogging.JacksonEncoder</json>
+                <appendLoggerName>true</appendLoggerName>
+                <prefix>com.github.aaabramov</prefix>
+                <pattern>%message %xException{10}</pattern>
+            </layout>
+        </encoder>
+    </appender>
+
+    <appender name="ASYNCSTDOUT" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="STDOUT"/>
+    </appender>
+
+    <logger name="com.github" level="DEBUG"/>
+
+    <root level="DEBUG">
+        <appender-ref ref="ASYNCSTDOUT"/>
+    </root>
+</configuration>
