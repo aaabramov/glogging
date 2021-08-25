@@ -1,5 +1,7 @@
 # Logback layout for Google Structured logging
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.aaabramov/glogging/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.aaabramov/glogging)
+
 ## Why?
 
 - Google indexes logs - easies and faster to filter logs.
