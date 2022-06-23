@@ -2,6 +2,11 @@
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.aaabramov/glogging/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.aaabramov/glogging) ![Build](https://github.com/aaabramov/glogging/actions/workflows/maven.yml/badge.svg)
 
+---
+
+[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct-single.svg)](https://stand-with-ukraine.pp.ua)
+
+---
 
 ## Why?
 
