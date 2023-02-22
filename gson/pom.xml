@@ -5,12 +5,16 @@
     <parent>
         <groupId>io.github.aaabramov</groupId>
         <artifactId>glogging</artifactId>
-        <version>0.0.3-SNAPSHOT</version>
+        <version>0.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>glogging-gson</artifactId>
 
     <name>gson</name>
+
+    <properties>
+        <version.gson>2.10.1</version.gson>
+    </properties>
 
     <dependencies>
 
@@ -24,7 +28,7 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.8.8</version>
+            <version>${version.gson}</version>
         </dependency>
 
     </dependencies>

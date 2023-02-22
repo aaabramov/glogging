@@ -128,7 +128,7 @@ public class GoogleLayout extends PatternLayout {
         StatusManager sm = this.getContext().getStatusManager();
         sm.add(
                 new ErrorStatus(
-                        s + "Specify on of: [io.github.aaabramov.glogging.GsonEncoder, TODO]",
+                        s + "Specify one of: [io.github.aaabramov.glogging.GsonEncoder, io.github.aaabramov.glogging.JacksonEncoder]",
                         this
                 )
         );
