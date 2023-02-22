@@ -132,4 +132,5 @@ libraryDependencies ++= Seq(
 mvn versions:set -DnewVersion=X.Y.Z
 mvn versions:commit
 mvn clean javadoc:jar source:jar verify gpg:sign deploy
+# Close & Release here https://s01.oss.sonatype.org/#stagingRepositories
 ```
