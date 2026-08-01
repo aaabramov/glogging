@@ -10,7 +10,7 @@
 
 ## Why?
 
-- Google indexes logs - easies and faster to filter logs.
+- Google indexes logs - easier and faster to filter logs.
   See [Using the Logs Explorer](https://cloud.google.com/logging/docs/view/logs-viewer-interface)
 - Aggregating logs by labels
 - Log metrics
@@ -128,9 +128,21 @@ libraryDependencies ++= Seq(
 
 ## Releasing
 
+Published to the [Sonatype Central Portal](https://central.sonatype.com) (the legacy
+OSSRH / `s01.oss.sonatype.org` staging flow was [retired on 2025-06-30](https://central.sonatype.org/news/20250326_ossrh_sunset/)).
+
+One-time setup:
+
+- A [Central Portal user token](https://central.sonatype.com/account) configured in `~/.m2/settings.xml`
+  under a `<server>` with `<id>central</id>`.
+- A GPG key published to a public keyserver for artifact signing.
+
+Release:
+
 ```bash
 mvn versions:set -DnewVersion=X.Y.Z
 mvn versions:commit
-mvn clean javadoc:jar source:jar verify gpg:sign deploy
-# Close & Release here https://s01.oss.sonatype.org/#stagingRepositories
+# The `release` profile attaches sources+javadoc, GPG-signs, and uploads to the
+# Central Portal (autoPublish=true, so no manual "Close & Release" step).
+mvn -Prelease clean deploy
 ```
