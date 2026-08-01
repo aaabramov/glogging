@@ -13,7 +13,7 @@
     <name>gson</name>
 
     <properties>
-        <version.gson>2.10.1</version.gson>
+        <version.gson>2.14.0</version.gson>
     </properties>
 
     <dependencies>
@@ -29,6 +29,12 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>${version.gson}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
