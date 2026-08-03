@@ -41,6 +41,12 @@ collector, or need richer structured payloads than `message` plus labels.
 
 ## Getting started
 
+You need **logback 1.3 or newer** on the classpath. glogging does not bring it: it is an
+extension to logback, not a distribution of it, so it declares logback as `provided` and
+leaves the version to you. Most applications already have it — via `spring-boot-starter`,
+say — in which case there is nothing extra to add. If yours does not, declare
+`ch.qos.logback:logback-classic` alongside the artifacts below.
+
 Maven:
 
 ```xml

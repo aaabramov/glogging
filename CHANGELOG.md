@@ -9,6 +9,25 @@ single version, so one entry covers them all.
 
 ## Unreleased
 
+### Changed
+
+- **logback is now `provided`, not `compile`.** glogging is an extension to logback, so it
+  no longer ships one: `glogging-core` used to export logback 1.3.x onto every consumer,
+  where it competed with whatever logback the application actually ran. Nearest-wins
+  usually spared an app on 1.5.x/1.6.x, but that is luck, not design.
+
+  ```
+  before:  glogging-gson -> glogging-core -> logback-core   1.3.16 (compile)
+                                          -> logback-classic 1.3.16 (compile)
+                                             -> slf4j-api     2.0.7 (compile)
+  after:   glogging-gson -> glogging-core          (no logback, no slf4j)
+  ```
+
+  > **Action required if glogging was your only source of logback.** Declare
+  > `ch.qos.logback:logback-classic` (1.3 or newer) yourself. Applications that already
+  > get logback from elsewhere — `spring-boot-starter` and friends — need no change, and
+  > will stop being at risk of a silent downgrade to 1.3.x.
+
 ### Fixed
 
 - `GcpTimestamp` no longer produces a negative `nanos` for pre-1970 instants. The two
