@@ -101,7 +101,14 @@
                 <plugin>
                     <groupId>org.sonatype.central</groupId>
                     <artifactId>central-publishing-maven-plugin</artifactId>
-                    <version>0.7.0</version>
+                    <!--
+                        Keep this current. The Portal API adds response fields over
+                        time and the plugin deserializes them strictly, so an old
+                        plugin fails *after* the bundle has already been accepted:
+                        0.7.0 died on Unrecognized field "warnings", which 0.11.0
+                        added to DeploymentApiResponse.
+                    -->
+                    <version>0.11.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
