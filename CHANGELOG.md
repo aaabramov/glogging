@@ -9,6 +9,13 @@ single version, so one entry covers them all.
 
 ## Unreleased
 
+### Internal
+
+- Fixed the release workflow's README bump, which failed on its first run (v0.1.2) by
+  calling `git commit` with nothing staged. The 0.1.2 release itself was unaffected —
+  the step runs last precisely so that a failure there cannot damage a release — and
+  the README was corrected by hand.
+
 ## 0.1.2 — 2026-08-03
 
 ### Fixed
