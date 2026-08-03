@@ -232,6 +232,53 @@ public class MyEncoder implements JsonEncoder {
 Implementations must not throw — a layout that propagates an exception breaks the
 application it is logging for. Report failures in the returned string instead.
 
+## Upgrading to 0.2.0
+
+0.2.0 fixes labels, which had never actually worked, and the fix changes the emitted JSON.
+Four things may need attention. The first two affect your **queries**, not your code, so
+they will not show up as a compile error — check them before deploying.
+
+**1. Label filters move out of the payload.** Labels are now emitted under
+`logging.googleapis.com/labels`, so Cloud Logging promotes them to `LogEntry.labels`
+instead of leaving them in `jsonPayload`:
+
+```diff
+- jsonPayload.labels."com.yourcompany/userId"="42"
++ labels."com.yourcompany/userId"="42"
+```
+
+**2. The message moves to `textPayload`.** Every field glogging emits is now one Cloud
+Logging recognises, so it collapses the payload and there is no `jsonPayload` at all:
+
+```diff
+- jsonPayload.message:"connection refused"
++ textPayload:"connection refused"
+```
+
+Update any **log-based metrics, saved queries, alerting policies and dashboards** built on
+the old paths. Stack traces are unaffected: `%xException` output still travels in the
+message, so Error Reporting keeps working.
+
+**3. Declare logback yourself if glogging was your only source of it.** logback is now
+`provided`, so glogging no longer puts its own 1.3.x on your classpath — where it competed
+with whatever logback you actually run:
+
+```xml
+<dependency>
+    <groupId>ch.qos.logback</groupId>
+    <artifactId>logback-classic</artifactId>
+    <version>1.5.x</version> <!-- or 1.3.x on Java 8 -->
+</dependency>
+```
+
+Most applications already get logback via `spring-boot-starter` or similar and need no
+change — those also stop being at risk of a silent downgrade to 1.3.x.
+
+**4. Only if you wrote your own `JsonEncoder`:** the method now takes a
+`Map<String, Object>` instead of the (package-private, hence unusable) event type. See
+[Custom JSON encoder](#custom-json-encoder). If you use `GsonEncoder` or `JacksonEncoder`,
+there is nothing to do.
+
 ## Changelog
 
 See **[CHANGELOG.md](CHANGELOG.md)** — worth a look before upgrading, as it records the

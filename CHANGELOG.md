@@ -9,8 +9,11 @@ single version, so one entry covers them all.
 
 ## Unreleased
 
-Intended as **0.2.0** — the changes below alter the emitted JSON and the `JsonEncoder`
-interface.
+## 0.2.0 — 2026-08-04
+
+**Breaking.** Changes the emitted JSON, the `JsonEncoder` interface, and what glogging
+puts on your classpath. See [Upgrading to 0.2.0](README.md#upgrading-to-020) for the
+whole migration in one place; each entry below also carries its own action-required note.
 
 ### Fixed
 
@@ -29,13 +32,13 @@ interface.
 
   > **Action required.** Logs Explorer queries, log-based metrics and alerts written
   > against `jsonPayload.labels.*` must move to `labels.*`, e.g.
-  > `labels."com.yourcompany/userId"="42"`.
+  > `labels."com.yourcompany/userId"="42"`. ([#21])
 
 - `GcpTimestamp` no longer produces a negative `nanos` for pre-1970 instants. The two
   fields model a protobuf `Timestamp`, which requires `0 <= nanos <= 999999999`;
   truncating division produced e.g. `{seconds: -1, nanos: -500000000}` for `-1500ms`.
   Unreachable from a logging event on a sane clock, so this is correctness rather than a
-  user-visible fix.
+  user-visible fix. ([#22])
 
 ### Changed
 
@@ -43,14 +46,14 @@ interface.
   consequence of the fix above: once every emitted field is one Cloud Logging recognises,
   it collapses the payload. Queries on `jsonPayload.message` must move to `textPayload`.
   Everything `<pattern>` puts in the message, `%xException` included, is preserved there,
-  so Error Reporting still picks up stack traces.
+  so Error Reporting still picks up stack traces. ([#21])
 - **`JsonEncoder.toJson` now takes `Map<String, Object>`** rather than the
   package-private `GcpLoggingEvent`. Required by the fix — `logging.googleapis.com/labels`
   is not expressible as a Java field name, and `core` carries no Gson or Jackson
   annotations to rename one. A welcome side effect: the interface is now genuinely
   implementable outside the library's own package, which the README had claimed since
-  0.0.1 without it being true.
-- An empty label set is omitted entirely rather than emitted as `{}`.
+  0.0.1 without it being true. ([#21])
+- An empty label set is omitted entirely rather than emitted as `{}`. ([#21])
 - **logback is now `provided`, not `compile`.** glogging is an extension to logback, so it
   no longer ships one: `glogging-core` used to export logback 1.3.x onto every consumer,
   where it competed with whatever logback the application actually ran. Nearest-wins
@@ -66,14 +69,25 @@ interface.
   > **Action required if glogging was your only source of logback.** Declare
   > `ch.qos.logback:logback-classic` (1.3 or newer) yourself. Applications that already
   > get logback from elsewhere — `spring-boot-starter` and friends — need no change, and
-  > will stop being at risk of a silent downgrade to 1.3.x.
+  > will stop being at risk of a silent downgrade to 1.3.x. ([#24])
+
+### Documentation
+
+- README now states **when to use glogging and when not to**, comparing it against Log4j2's
+  built-in `GcpLayout.json` template, the official `google-cloud-logging-logback` appender,
+  and `logstash-logback-encoder`. If you are on Log4j2, use its built-in template — glogging
+  is logback-only. ([#23])
+- Added a [Labels](README.md#labels) section explaining how MDC entries become queryable
+  `LogEntry.labels`, a [Custom JSON encoder](README.md#custom-json-encoder) example — now
+  that the SPI is actually implementable — and a note that a JSON-valued message stays a
+  string, searchable with `textPayload:"..."` but not structurally queryable. ([#21])
 
 ### Internal
 
 - Fixed the release workflow's README bump, which failed on its first run (v0.1.2) by
   calling `git commit` with nothing staged. The 0.1.2 release itself was unaffected —
   the step runs last precisely so that a failure there cannot damage a release — and
-  the README was corrected by hand.
+  the README was corrected by hand. ([#20])
 
 ## 0.1.2 — 2026-08-03
 
@@ -156,3 +170,8 @@ interface.
 [#16]: https://github.com/aaabramov/glogging/pull/16
 [#17]: https://github.com/aaabramov/glogging/pull/17
 [#18]: https://github.com/aaabramov/glogging/pull/18
+[#20]: https://github.com/aaabramov/glogging/pull/20
+[#21]: https://github.com/aaabramov/glogging/pull/21
+[#22]: https://github.com/aaabramov/glogging/pull/22
+[#23]: https://github.com/aaabramov/glogging/pull/23
+[#24]: https://github.com/aaabramov/glogging/pull/24
