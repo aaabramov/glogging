@@ -9,6 +9,14 @@ single version, so one entry covers them all.
 
 ## Unreleased
 
+### Fixed
+
+- `GcpTimestamp` no longer produces a negative `nanos` for pre-1970 instants. The two
+  fields model a protobuf `Timestamp`, which requires `0 <= nanos <= 999999999`;
+  truncating division produced e.g. `{seconds: -1, nanos: -500000000}` for `-1500ms`.
+  Unreachable from a logging event on a sane clock, so this is correctness rather than a
+  user-visible fix.
+
 ### Internal
 
 - Fixed the release workflow's README bump, which failed on its first run (v0.1.2) by
