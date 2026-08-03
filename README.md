@@ -128,51 +128,14 @@ libraryDependencies ++= Seq(
 
 ## Releasing
 
-Published to the [Sonatype Central Portal](https://central.sonatype.com) (the legacy
-OSSRH / `s01.oss.sonatype.org` staging flow was [retired on 2025-06-30](https://central.sonatype.org/news/20250326_ossrh_sunset/)).
-The `release` profile attaches sources+javadoc, GPG-signs, and uploads to the Central
-Portal.
-
-> **Note:** publishing to Central is permanent — a released version can never be deleted
-> or overwritten. `autoPublish=true` means a tag push goes live with no manual step, so
-> to rehearse a risky release set `autoPublish=false` / `waitUntil=validated` in the root
-> `pom.xml`. The bundle is then uploaded, signed and validated, but parked at
-> [central.sonatype.com](https://central.sonatype.com) awaiting a manual **Publish** —
-> and can be dropped instead.
-
-### Via GitHub Actions (recommended)
-
-The [`Release` workflow](.github/workflows/release.yml) publishes from CI, so no local
-token or GPG key is needed. Configure these repository secrets once
-(**Settings → Secrets and variables → Actions**):
-
-| Secret | Value |
-| --- | --- |
-| `CENTRAL_TOKEN_USERNAME` | Central Portal user token username ([central.sonatype.com/usertoken](https://central.sonatype.com/usertoken)) |
-| `CENTRAL_TOKEN_PASSWORD` | Central Portal user token password |
-| `GPG_PRIVATE_KEY` | ASCII-armored secret key: `gpg --armor --export-secret-keys <KEY_ID>` |
-| `GPG_PASSPHRASE` | passphrase for that key |
-
-Then release by pushing a version tag:
+Published to the [Sonatype Central Portal](https://central.sonatype.com) by pushing a
+version tag — the [`Release` workflow](.github/workflows/release.yml) builds, signs and
+uploads the artifacts, then creates a GitHub Release:
 
 ```bash
-git tag v0.1.1
-git push origin v0.1.1
+git tag v0.1.2
+git push origin v0.1.2
 ```
 
-The tag name (minus the `v`) becomes the released version, and a
-[GitHub Release](https://github.com/aaabramov/glogging/releases) with auto-generated
-notes is created once the upload succeeds. You can also trigger the workflow manually
-from the **Actions** tab ("Run workflow") with an explicit version; that path publishes
-to Central but creates no GitHub Release, since there is no tag to attach it to.
-
-### Locally
-
-Needs a Central Portal user token in `~/.m2/settings.xml` under a `<server>` with
-`<id>central</id>`, and a GPG key published to a public keyserver:
-
-```bash
-mvn versions:set -DnewVersion=X.Y.Z
-mvn versions:commit
-mvn -Prelease clean deploy
-```
+Maintainers: see **[RELEASING.md](RELEASING.md)** for the full procedure, one-time
+setup, and the gotchas worth knowing before cutting a release.
