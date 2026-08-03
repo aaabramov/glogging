@@ -12,7 +12,7 @@ single version, so one entry covers them all.
 ## 0.2.0 — 2026-08-04
 
 **Breaking.** Changes the emitted JSON, the `JsonEncoder` interface, and what glogging
-puts on your classpath. See [Upgrading to 0.2.0](README.md#upgrading-to-020) for the
+puts on your classpath. See [docs/UPGRADING.md](docs/UPGRADING.md) for the
 whole migration in one place; each entry below also carries its own action-required note.
 
 ### Fixed
