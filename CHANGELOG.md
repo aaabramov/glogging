@@ -9,8 +9,48 @@ single version, so one entry covers them all.
 
 ## Unreleased
 
+Intended as **0.2.0** — the changes below alter the emitted JSON and the `JsonEncoder`
+interface.
+
+### Fixed
+
+- **Labels now reach `LogEntry.labels`.** They are emitted under the special
+  `logging.googleapis.com/labels` key instead of a plain `labels` object. A bare `labels`
+  object is not a special field, so Cloud Logging never promoted it — labels stayed inside
+  `jsonPayload`, unusable for label-based filtering and log-based metrics. This was the
+  library's headline feature and it did not work.
+
+  Verified against a real GKE cluster before and after, not inferred from documentation:
+
+  | Emitted | `LogEntry.labels` | Payload |
+  |---|---|---|
+  | `"labels":{…}` (≤ 0.1.2) | ours **absent** | `jsonPayload.labels` |
+  | `"logging.googleapis.com/labels":{…}` (0.2.0) | ours **present** | `textPayload` |
+
+  > **Action required.** Logs Explorer queries, log-based metrics and alerts written
+  > against `jsonPayload.labels.*` must move to `labels.*`, e.g.
+  > `labels."com.yourcompany/userId"="42"`.
+
+- `GcpTimestamp` no longer produces a negative `nanos` for pre-1970 instants. The two
+  fields model a protobuf `Timestamp`, which requires `0 <= nanos <= 999999999`;
+  truncating division produced e.g. `{seconds: -1, nanos: -500000000}` for `-1500ms`.
+  Unreachable from a logging event on a sane clock, so this is correctness rather than a
+  user-visible fix.
+
 ### Changed
 
+- **Entries no longer have a `jsonPayload`; the message is in `textPayload`.** A
+  consequence of the fix above: once every emitted field is one Cloud Logging recognises,
+  it collapses the payload. Queries on `jsonPayload.message` must move to `textPayload`.
+  Everything `<pattern>` puts in the message, `%xException` included, is preserved there,
+  so Error Reporting still picks up stack traces.
+- **`JsonEncoder.toJson` now takes `Map<String, Object>`** rather than the
+  package-private `GcpLoggingEvent`. Required by the fix — `logging.googleapis.com/labels`
+  is not expressible as a Java field name, and `core` carries no Gson or Jackson
+  annotations to rename one. A welcome side effect: the interface is now genuinely
+  implementable outside the library's own package, which the README had claimed since
+  0.0.1 without it being true.
+- An empty label set is omitted entirely rather than emitted as `{}`.
 - **logback is now `provided`, not `compile`.** glogging is an extension to logback, so it
   no longer ships one: `glogging-core` used to export logback 1.3.x onto every consumer,
   where it competed with whatever logback the application actually ran. Nearest-wins
@@ -27,14 +67,6 @@ single version, so one entry covers them all.
   > `ch.qos.logback:logback-classic` (1.3 or newer) yourself. Applications that already
   > get logback from elsewhere — `spring-boot-starter` and friends — need no change, and
   > will stop being at risk of a silent downgrade to 1.3.x.
-
-### Fixed
-
-- `GcpTimestamp` no longer produces a negative `nanos` for pre-1970 instants. The two
-  fields model a protobuf `Timestamp`, which requires `0 <= nanos <= 999999999`;
-  truncating division produced e.g. `{seconds: -1, nanos: -500000000}` for `-1500ms`.
-  Unreachable from a logging event on a sane clock, so this is correctness rather than a
-  user-visible fix.
 
 ### Internal
 

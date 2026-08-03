@@ -131,7 +131,7 @@ public class GoogleLayout extends PatternLayout {
                 formattedMessage,
                 labels
         );
-        return jsonEncoder.toJson(e) + "\n";
+        return jsonEncoder.toJson(e.toJsonMap()) + "\n";
     }
 
     private void reportInvalidJsonParam(String s) {
