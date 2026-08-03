@@ -1,0 +1,58 @@
+# Dependabot keeps the build and release toolchain current.
+# https://docs.github.com/code-security/dependabot/working-with-dependabot/dependabot-options-reference
+
+version: 2
+
+updates:
+  # Workflow actions. Besides ordinary version bumps this surfaces runtime
+  # deprecations early - v4 of checkout/setup-java pinned Node 20 long after
+  # GitHub began forcing those runs onto Node 24.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci"
+    groups:
+      # One PR for all of them; they are near-always safe together.
+      github-actions:
+        patterns:
+          - "*"
+
+  # Maven dependencies AND plugins. Dependabot reads the root pom and follows
+  # <modules>, so core/gson/jackson are covered from here.
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "deps"
+    groups:
+      # The publishing toolchain, kept moving as a unit: a stale
+      # central-publishing-maven-plugin broke the 0.1.1 release because the
+      # Portal API had added a response field the old client rejected.
+      release-plugins:
+        patterns:
+          - "org.sonatype.central:*"
+          - "org.apache.maven.plugins:maven-gpg-plugin"
+          - "org.apache.maven.plugins:maven-source-plugin"
+          - "org.apache.maven.plugins:maven-javadoc-plugin"
+      test-dependencies:
+        patterns:
+          - "org.junit:*"
+
+    # This library compiles to Java 8 bytecode (maven.compiler.target=1.8) and
+    # is consumed by Java 8 apps. The upgrades below would quietly break that
+    # baseline, so they are pinned deliberately rather than left to Dependabot.
+    ignore:
+      # JUnit 6.x requires Java 17; 5.11.x is the last Java 8 line.
+      - dependency-name: "org.junit:junit-bom"
+        update-types:
+          - "version-update:semver-major"
+      # logback 1.3.x targets JDK 8; 1.4.x and 1.5.x target JDK 11. The jump is
+      # only a minor version, which makes it an easy one to merge by accident.
+      - dependency-name: "ch.qos.logback:*"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
