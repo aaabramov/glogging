@@ -170,20 +170,18 @@
                         <configuration>
                             <publishingServerId>central</publishingServerId>
                             <!--
-                                REHEARSAL SETTING - flip both back once the first CI
-                                release has proven the signing key:
-                                    <autoPublish>true</autoPublish>
-                                    <waitUntil>published</waitUntil>
+                                Tag pushes publish straight through, no manual step.
 
-                                With autoPublish=false the deployment is uploaded and
-                                validated, then parked in the Central Portal awaiting a
-                                manual "Publish" click - so it can still be dropped.
-                                Releases to Central are permanent and cannot be deleted
-                                or overwritten, so the first run using a new GPG key is
-                                worth doing this way.
+                                To rehearse a risky release instead - a new signing
+                                key, a big dependency jump - set autoPublish=false and
+                                waitUntil=validated. The bundle is then uploaded,
+                                signed and validated, but parked in the Portal awaiting
+                                a manual Publish, so it can still be dropped. Worth
+                                doing because a published version is permanent: Central
+                                never allows it to be deleted or overwritten.
                             -->
-                            <autoPublish>false</autoPublish>
-                            <waitUntil>validated</waitUntil>
+                            <autoPublish>true</autoPublish>
+                            <waitUntil>published</waitUntil>
                         </configuration>
                     </plugin>
                 </plugins>
