@@ -143,6 +143,11 @@ names Cloud Logging defines, which are not spelled quite the same:
 `NOTICE`, `CRITICAL`, `ALERT` and `EMERGENCY` are never emitted — logback tops out at
 `ERROR`.
 
+## Changelog
+
+See **[CHANGELOG.md](CHANGELOG.md)** — worth a look before upgrading, as it records the
+releases that changed the emitted JSON.
+
 ## Releasing
 
 Published to the [Sonatype Central Portal](https://central.sonatype.com) by pushing a
