@@ -28,8 +28,10 @@ concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
+# `write` is needed to create the GitHub Release at the end of the job;
+# the Maven Central upload itself only needs the secrets below.
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   release:
@@ -60,6 +62,12 @@ jobs:
           else
             version="${GITHUB_REF_NAME#v}"
           fi
+          # Central rejects SNAPSHOTs, but it does so only after the build has
+          # run; fail here instead so a mistyped tag costs seconds, not minutes.
+          case "${version}" in
+            *-SNAPSHOT) echo "::error::Refusing to release a SNAPSHOT version: ${version}"; exit 1 ;;
+            '')         echo "::error::Could not resolve a version to release"; exit 1 ;;
+          esac
           echo "version=${version}" >> "$GITHUB_OUTPUT"
           echo "Releasing version ${version}"
 
@@ -72,3 +80,12 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      # Only for tag pushes: a workflow_dispatch run has no tag to hang a
+      # release off. Runs last, so a failed upload never leaves a GitHub
+      # Release advertising a version that is not on Central.
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        run: gh release create "${GITHUB_REF_NAME}" --title "${GITHUB_REF_NAME}" --generate-notes --verify-tag
+        env:
+          GH_TOKEN: ${{ github.token }}

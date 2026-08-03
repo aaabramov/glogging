@@ -153,8 +153,11 @@ git tag v0.1.1
 git push origin v0.1.1
 ```
 
-The tag name (minus the `v`) becomes the released version. You can also trigger it
-manually from the **Actions** tab ("Run workflow") with an explicit version.
+The tag name (minus the `v`) becomes the released version, and a
+[GitHub Release](https://github.com/aaabramov/glogging/releases) with auto-generated
+notes is created once the upload succeeds. You can also trigger the workflow manually
+from the **Actions** tab ("Run workflow") with an explicit version; that path publishes
+to Central but creates no GitHub Release, since there is no tag to attach it to.
 
 ### Locally
 
