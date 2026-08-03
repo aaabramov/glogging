@@ -82,10 +82,44 @@ jobs:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
       # Only for tag pushes: a workflow_dispatch run has no tag to hang a
-      # release off. Runs last, so a failed upload never leaves a GitHub
-      # Release advertising a version that is not on Central.
+      # release off. Runs after the upload, so a failed publish never leaves a
+      # GitHub Release advertising a version that is not on Central.
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
         run: gh release create "${GITHUB_REF_NAME}" --title "${GITHUB_REF_NAME}" --generate-notes --verify-tag
         env:
           GH_TOKEN: ${{ github.token }}
+
+      # The version lives in the tag, not in master's pom, so the README is the
+      # only place on master that records what was released. Checked out
+      # separately because the job itself is sitting on the tag.
+      - name: Check out master
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/checkout@v5
+        with:
+          ref: master
+          path: .master
+
+      # Last on purpose: least critical step, so if it fails the release itself
+      # is still intact and the README can be corrected by hand.
+      - name: Point README at the released version
+        if: startsWith(github.ref, 'refs/tags/')
+        working-directory: .master
+        env:
+          VERSION: ${{ steps.v.outputs.version }}
+        run: |
+          # Scoped to the dependency snippets. A repository-wide substitution
+          # would also rewrite the `git tag vX.Y.Z` example further down, which
+          # is illustrative and must not track the current version.
+          sed -i -E "/^## Getting started/,/^## Configuration example/ s/[0-9]+\.[0-9]+\.[0-9]+/${VERSION}/g" README.md
+
+          if git diff --quiet README.md; then
+            echo "README already points at ${VERSION}"
+            exit 0
+          fi
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -qm "docs: point README at ${VERSION}"
+          git push origin master
+          echo "README updated to ${VERSION}"
