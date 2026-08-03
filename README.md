@@ -133,12 +133,12 @@ OSSRH / `s01.oss.sonatype.org` staging flow was [retired on 2025-06-30](https://
 The `release` profile attaches sources+javadoc, GPG-signs, and uploads to the Central
 Portal.
 
-> **Note:** `autoPublish` is currently `false` while the CI signing key is being proven
-> out, so an uploaded deployment is validated and then waits for a manual **Publish**
-> click at [central.sonatype.com](https://central.sonatype.com) (and can be dropped
-> instead). Set `autoPublish=true` / `waitUntil=published` in the root `pom.xml` to make
-> releases fully hands-off. Note that publishing to Central is permanent — a released
-> version can never be deleted or overwritten.
+> **Note:** publishing to Central is permanent — a released version can never be deleted
+> or overwritten. `autoPublish=true` means a tag push goes live with no manual step, so
+> to rehearse a risky release set `autoPublish=false` / `waitUntil=validated` in the root
+> `pom.xml`. The bundle is then uploaded, signed and validated, but parked at
+> [central.sonatype.com](https://central.sonatype.com) awaiting a manual **Publish** —
+> and can be dropped instead.
 
 ### Via GitHub Actions (recommended)
 
