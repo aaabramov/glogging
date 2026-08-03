@@ -2,8 +2,6 @@ package io.github.aaabramov.glogging;
 
 import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.status.ErrorStatus;
-import ch.qos.logback.core.status.StatusManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -86,35 +84,47 @@ public class GoogleLayout extends PatternLayout {
             prefix = "";
         }
         
-        validateJsonEncoder();
-        
+        if (!validateJsonEncoder()) {
+            return;
+        }
+
         try {
-            jsonEncoder = ((JsonEncoder) Class.forName(json).newInstance());
+            jsonEncoder = ((JsonEncoder) Class.forName(json).getDeclaredConstructor().newInstance());
         } catch (Exception e) {
-            reportInvalidJsonParam("Failed to initialize json encoder. Either it was not found on classpath or invalid class name provided.");
+            reportInvalidJsonParam("Failed to initialize json encoder. Either it was not found on classpath or invalid class name provided. ");
         }
     }
     
-    private void validateJsonEncoder() {
+    private boolean validateJsonEncoder() {
         if (json == null) {
-            reportInvalidJsonParam("Missing required 'json' parameter in logback configuration.");
+            reportInvalidJsonParam("Missing required 'json' parameter in logback configuration. ");
+            return false;
         } else if (json.isEmpty()) {
-            reportInvalidJsonParam("Provided empty 'json' parameter in logback configuration.");
+            reportInvalidJsonParam("Provided empty 'json' parameter in logback configuration. ");
+            return false;
         }
+        return true;
     }
-    
+
     @Override
     public String doLayout(ILoggingEvent event) {
         String formattedMessage = super.doLayout(event).trim();
-        
+
+        // The encoder failed to initialise (misconfiguration already reported
+        // to the logback status manager in start()). Degrade gracefully to the
+        // plain formatted message rather than throwing an NPE on every log line.
+        if (jsonEncoder == null) {
+            return formattedMessage + "\n";
+        }
+
         Map<String, String> mdc = event.getMDCPropertyMap();
         Map<String, String> labels = new HashMap<>(mdc.size() + 1);
-        
+
         mdc.forEach((k, v) -> labels.put(prefix + k, v));
         if (appendLoggerName) {
             labels.put(prefix + "loggerName", event.getLoggerName());
         }
-        
+
         GcpLoggingEvent e = new GcpLoggingEvent(
                 GcpTimestamp.ofEpoch(event.getTimeStamp()),
                 event.getLevel().levelStr,
@@ -123,15 +133,9 @@ public class GoogleLayout extends PatternLayout {
         );
         return jsonEncoder.toJson(e) + "\n";
     }
-    
+
     private void reportInvalidJsonParam(String s) {
-        StatusManager sm = this.getContext().getStatusManager();
-        sm.add(
-                new ErrorStatus(
-                        s + "Specify one of: [io.github.aaabramov.glogging.GsonEncoder, io.github.aaabramov.glogging.JacksonEncoder]",
-                        this
-                )
-        );
+        addError(s + "Specify one of: [io.github.aaabramov.glogging.GsonEncoder, io.github.aaabramov.glogging.JacksonEncoder]");
     }
     
 }
