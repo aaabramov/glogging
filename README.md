@@ -130,19 +130,39 @@ libraryDependencies ++= Seq(
 
 Published to the [Sonatype Central Portal](https://central.sonatype.com) (the legacy
 OSSRH / `s01.oss.sonatype.org` staging flow was [retired on 2025-06-30](https://central.sonatype.org/news/20250326_ossrh_sunset/)).
+The `release` profile attaches sources+javadoc, GPG-signs, and uploads to the Central
+Portal with `autoPublish=true`, so there is no manual "Close & Release" step.
 
-One-time setup:
+### Via GitHub Actions (recommended)
 
-- A [Central Portal user token](https://central.sonatype.com/account) configured in `~/.m2/settings.xml`
-  under a `<server>` with `<id>central</id>`.
-- A GPG key published to a public keyserver for artifact signing.
+The [`Release` workflow](.github/workflows/release.yml) publishes from CI, so no local
+token or GPG key is needed. Configure these repository secrets once
+(**Settings → Secrets and variables → Actions**):
 
-Release:
+| Secret | Value |
+| --- | --- |
+| `CENTRAL_TOKEN_USERNAME` | Central Portal user token username ([central.sonatype.com/usertoken](https://central.sonatype.com/usertoken)) |
+| `CENTRAL_TOKEN_PASSWORD` | Central Portal user token password |
+| `GPG_PRIVATE_KEY` | ASCII-armored secret key: `gpg --armor --export-secret-keys <KEY_ID>` |
+| `GPG_PASSPHRASE` | passphrase for that key |
+
+Then release by pushing a version tag:
+
+```bash
+git tag v0.1.1
+git push origin v0.1.1
+```
+
+The tag name (minus the `v`) becomes the released version. You can also trigger it
+manually from the **Actions** tab ("Run workflow") with an explicit version.
+
+### Locally
+
+Needs a Central Portal user token in `~/.m2/settings.xml` under a `<server>` with
+`<id>central</id>`, and a GPG key published to a public keyserver:
 
 ```bash
 mvn versions:set -DnewVersion=X.Y.Z
 mvn versions:commit
-# The `release` profile attaches sources+javadoc, GPG-signs, and uploads to the
-# Central Portal (autoPublish=true, so no manual "Close & Release" step).
 mvn -Prelease clean deploy
 ```

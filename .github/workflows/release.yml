@@ -1,0 +1,74 @@
+# Publishes the artifacts to Maven Central (Sonatype Central Portal).
+#
+# Trigger either by pushing a version tag:
+#     git tag v0.1.1 && git push origin v0.1.1
+# or manually from the Actions tab ("Run workflow") with an explicit version.
+#
+# Required repository secrets (Settings -> Secrets and variables -> Actions):
+#   CENTRAL_TOKEN_USERNAME  - Central Portal user token username (central.sonatype.com/usertoken)
+#   CENTRAL_TOKEN_PASSWORD  - Central Portal user token password
+#   GPG_PRIVATE_KEY         - ASCII-armored secret key: `gpg --armor --export-secret-keys <KEY_ID>`
+#   GPG_PASSPHRASE          - passphrase for that key
+#
+# The `release` profile (in the root pom.xml) attaches sources+javadoc, GPG-signs,
+# and uploads to the Portal with autoPublish=true, so no manual "Close & Release".
+
+name: Release
+
+on:
+  push:
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release, e.g. 0.1.1'
+        required: true
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # JDK 11: artifacts stay Java 8 bytecode (maven.compiler.target=1.8), while
+      # every release plugin (javadoc, gpg, central-publishing) runs cleanly.
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: 'maven'
+          server-id: central
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Resolve release version
+        id: v
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            version="${{ github.event.inputs.version }}"
+          else
+            version="${GITHUB_REF_NAME#v}"
+          fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "Releasing version ${version}"
+
+      - name: Set project version
+        run: mvn -B versions:set -DnewVersion=${{ steps.v.outputs.version }} -DgenerateBackupPoms=false
+
+      - name: Publish to Maven Central
+        run: mvn -B -Prelease clean deploy
+        env:
+          MAVEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
