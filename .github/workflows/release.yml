@@ -120,6 +120,11 @@ jobs:
 
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # `git commit` without -a only commits what is staged, and sed edits the
+          # working tree - so omitting this add made the step fail with "no changes
+          # added to commit" on v0.1.2, its first ever run. Named explicitly rather
+          # than using -a so an unrelated dirty file can never ride along.
+          git add README.md
           git commit -qm "docs: point README at ${VERSION}"
           git push origin master
           echo "README updated to ${VERSION}"
