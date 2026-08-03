@@ -14,6 +14,8 @@
 
     <properties>
         <version.gson>2.14.0</version.gson>
+        <!-- Stable JPMS module name; see the note in core/pom.xml. -->
+        <module.name>io.github.aaabramov.glogging.gson</module.name>
     </properties>
 
     <dependencies>

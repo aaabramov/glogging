@@ -53,6 +53,18 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <!--
+            Makes the build reproducible: fixes every archive entry's timestamp
+            instead of stamping "now", so the same source tree yields
+            byte-identical jars. Recommended for Maven Central publication.
+            https://maven.apache.org/guides/mini/guide-reproducible-builds.html
+
+            Deliberately a constant, not ${maven.build.timestamp} - a moving
+            value would defeat the point. Bump it by hand when cutting a
+            release if you want it to reflect that release's date; the value
+            only has to be stable, it does not have to be accurate.
+        -->
+        <project.build.outputTimestamp>2026-08-03T00:00:00Z</project.build.outputTimestamp>
         <!-- Stay on 5.x: it keeps a Java 8 baseline, while 6.x requires Java 17.
              Dependabot ignores majors here for that reason. -->
         <version.junit>5.14.4</version.junit>
@@ -79,6 +91,17 @@
     <build>
         <pluginManagement>
             <plugins>
+                <!--
+                    Pinned (rather than inherited from the super-POM) so the
+                    build does not change shape with the Maven version, and so
+                    Dependabot tracks it. Each module sets its own
+                    Automatic-Module-Name through this plugin.
+                -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.5.1</version>
+                </plugin>
                 <!-- Attaching source jar (required by Maven Central) -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -113,6 +136,25 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
+        <plugins>
+            <!--
+                Inherited by every module; each one supplies its own
+                ${module.name}. Configured once here rather than three times to
+                keep the modules from drifting apart.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Automatic-Module-Name>${module.name}</Automatic-Module-Name>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
     <profiles>

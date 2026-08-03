@@ -9,6 +9,12 @@ on:
   pull_request:
     branches: [ master ]
 
+# Least privilege: this job only ever reads the tree. Without an explicit block
+# the job inherits the repository default, which may be read *and write* - a
+# needlessly large token to hand to a build that runs third-party plugin code.
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
