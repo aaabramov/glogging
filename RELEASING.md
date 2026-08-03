@@ -12,6 +12,14 @@ Sonatype token is required.
 
 ## Cutting a release
 
+First, move the pending entries in [CHANGELOG.md](CHANGELOG.md) from `## Unreleased`
+into a section for the version you are about to tag, and merge that to `master`. The
+release notes on the GitHub Release are auto-generated from commit subjects, so the
+changelog is the only place a behaviour change gets explained to the people it
+affects — 0.1.2 changed the emitted `severity` values, which no PR title conveys.
+
+Then:
+
 ```bash
 git checkout master && git pull
 git tag v0.1.2
