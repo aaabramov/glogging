@@ -162,8 +162,21 @@
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>central</publishingServerId>
-                            <autoPublish>true</autoPublish>
-                            <waitUntil>published</waitUntil>
+                            <!--
+                                REHEARSAL SETTING - flip both back once the first CI
+                                release has proven the signing key:
+                                    <autoPublish>true</autoPublish>
+                                    <waitUntil>published</waitUntil>
+
+                                With autoPublish=false the deployment is uploaded and
+                                validated, then parked in the Central Portal awaiting a
+                                manual "Publish" click - so it can still be dropped.
+                                Releases to Central are permanent and cannot be deleted
+                                or overwritten, so the first run using a new GPG key is
+                                worth doing this way.
+                            -->
+                            <autoPublish>false</autoPublish>
+                            <waitUntil>validated</waitUntil>
                         </configuration>
                     </plugin>
                 </plugins>
