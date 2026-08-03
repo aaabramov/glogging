@@ -55,7 +55,7 @@ Maven:
     <dependency>
         <groupId>io.github.aaabramov</groupId>
         <artifactId>glogging-core</artifactId>
-        <version>0.1.2</version>
+        <version>0.2.0</version>
     </dependency>
 
 
@@ -64,7 +64,7 @@ Maven:
         <artifactId>glogging-gson</artifactId>
         <!-- OR -->
         <!--<artifactId>glogging-jackson</artifactId>-->
-        <version>0.1.2</version>
+        <version>0.2.0</version>
     </dependency>
 </dependencies>
 ```
@@ -72,19 +72,19 @@ Maven:
 Gradle (Groovy):
 
 ```groovy
-implementation 'io.github.aaabramov:glogging-core:0.1.2'
-implementation 'io.github.aaabramov:glogging-gson:0.1.2'
+implementation 'io.github.aaabramov:glogging-core:0.2.0'
+implementation 'io.github.aaabramov:glogging-gson:0.2.0'
 // OR 
-// implementation 'io.github.aaabramov:glogging-jackson:0.1.2'
+// implementation 'io.github.aaabramov:glogging-jackson:0.2.0'
 ```
 
 Gradle (Kotlin):
 
 ```kotlin
-implementation("io.github.aaabramov:glogging-core:0.1.2")
-implementation("io.github.aaabramov:glogging-gson:0.1.2")
+implementation("io.github.aaabramov:glogging-core:0.2.0")
+implementation("io.github.aaabramov:glogging-gson:0.2.0")
 // OR 
-// implementation("io.github.aaabramov:glogging-jackson:0.1.2")
+// implementation("io.github.aaabramov:glogging-jackson:0.2.0")
 ```
 
 Sbt:
@@ -95,7 +95,7 @@ libraryDependencies ++= Seq(
   "io.github.aaabramov" % "glogging-gson"
   //  OR
   //  "io.github.aaabramov" % "glogging-jackson"
-).map(_ % "0.1.2")
+).map(_ % "0.2.0")
 ```
 
 ## Configuration example:
