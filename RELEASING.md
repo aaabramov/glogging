@@ -31,7 +31,8 @@ single source of truth, and CI rewrites the poms to match at build time.
 > stays at a `-SNAPSHOT` value permanently. This is a consequence of taking the
 > version from the tag, and it means `git show v0.1.1:pom.xml` reports a
 > *different* version than the one actually released under that tag. Only the
-> published artifact carries the real version.
+> published artifact — and the README, which CI rewrites — carry the real
+> version.
 
 ### What the workflow does
 
@@ -43,9 +44,19 @@ single source of truth, and CI rewrites the poms to match at build time.
 3. Runs the `release` profile: attaches sources and javadoc, GPG-signs every
    artifact, uploads the bundle to the Central Portal.
 4. Creates a GitHub Release with auto-generated notes.
+5. Rewrites the dependency snippets in the README to the released version and
+   commits that to `master` as `github-actions[bot]`.
 
-Step 4 is deliberately **last** and gated on the tag ref, so a failed upload
-never leaves a GitHub Release advertising a version that isn't on Central.
+Steps 4 and 5 are deliberately **last** and gated on the tag ref, so a failed
+upload never leaves a GitHub Release — or a README — advertising a version that
+isn't on Central. Step 5 is last of all because it is the least important: if it
+fails, the release is still intact and the README can be fixed by hand.
+
+> **The README substitution is scoped to the `## Getting started` section.** A
+> repository-wide replacement would also rewrite the `git tag vX.Y.Z` example in
+> this document's [Cutting a release](#cutting-a-release) section, which is
+> illustrative and must not track the current version. If you add a new snippet
+> carrying the version, put it in that section or the bump will skip it.
 
 ---
 
