@@ -30,7 +30,7 @@ you better:
 
 | | Logging API | Transport | Notes |
 |---|---|---|---|
-| **glogging** | logback | stdout | Two small artifacts; the only third-party dependency is your choice of Gson or Jackson. |
+| **glogging** | logback | stdout | Two small artifacts; the only third-party dependency is your choice of Gson or Jackson — or neither, if you [supply your own encoder](#custom-json-encoder). |
 | [`log4j-layout-template-json`](https://logging.apache.org/log4j/2.x/manual/json-template-layout.html) | Log4j2 | stdout | Ships a `GcpLayout.json` template — verified present in 2.26.1. **If you are on Log4j2, use this**; glogging is logback-only. |
 | [`google-cloud-logging-logback`](https://github.com/googleapis/java-logging-logback) | logback | Logging API | Official. Writes over the network from inside your process, so no collector is needed — useful off-GCP — at the cost of credentials, a large dependency tree, and log delivery sharing fate with your network. Still published as `-alpha` (0.144.0-alpha at the time of writing). |
 | [`logstash-logback-encoder`](https://github.com/logfellow/logstash-logback-encoder) | logback | stdout | Far more featureful — structured arguments, nested payloads, many providers. No GCP template, so you configure the special field names yourself. |
