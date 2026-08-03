@@ -13,7 +13,7 @@
     <name>core</name>
 
     <properties>
-        <version.logback>1.3.16</version.logback>
+        <!-- version.logback lives in the root pom: gson and jackson need it too. -->
         <!--
             Stable module name for JPMS consumers. Without it the JDK derives one
             from the jar filename, which is both unstable and unchangeable later
@@ -24,16 +24,28 @@
 
     <dependencies>
 
+        <!--
+            provided, not compile: this is an extension *to* logback, so the
+            application already has it. Exporting it as a compile dependency
+            pushed our 1.3.x onto every consumer, where it competes with
+            whatever logback they actually run - nearest-wins usually spares an
+            app on 1.5.x/1.6.x, but relying on that is not a design.
+
+            The version below is therefore a floor for compiling and testing
+            *this* project, not a version we ship to anyone.
+        -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
             <version>${version.logback}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${version.logback}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

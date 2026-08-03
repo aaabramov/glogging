@@ -33,6 +33,19 @@
             <version>${version.gson}</version>
         </dependency>
 
+        <!--
+            Test-only: the demo App and logback.xml under src/test exercise the
+            layout end to end. The encoder itself needs no logback, and core's
+            copy is `provided`, which is not transitive - so it is declared here
+            rather than inherited.
+        -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${version.logback}</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
