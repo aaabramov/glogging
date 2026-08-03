@@ -52,7 +52,7 @@ class GoogleLayoutTest {
         layout.doLayout(event(Level.WARN, "boom", Collections.emptyMap()));
 
         GcpLoggingEvent recorded = RecordingEncoder.lastEvent;
-        assertEquals("WARN", recorded.severity);
+        assertEquals("WARNING", recorded.severity);
         assertEquals("boom", recorded.message);
         assertEquals(1629642099L, recorded.timestamp.seconds);
         assertEquals(659_000_000L, recorded.timestamp.nanos);
