@@ -14,6 +14,12 @@
 
     <properties>
         <version.logback>1.3.16</version.logback>
+        <!--
+            Stable module name for JPMS consumers. Without it the JDK derives one
+            from the jar filename, which is both unstable and unchangeable later
+            without breaking every `requires` clause that guessed it.
+        -->
+        <module.name>io.github.aaabramov.glogging.core</module.name>
     </properties>
 
     <dependencies>

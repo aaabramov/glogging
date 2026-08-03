@@ -1,6 +1,6 @@
 # Logback layout for Google Structured logging
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.aaabramov/glogging/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.aaabramov/glogging) ![Build](https://github.com/aaabramov/glogging/actions/workflows/maven.yml/badge.svg)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.aaabramov/glogging-core?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.aaabramov/glogging-core) [![Build](https://github.com/aaabramov/glogging/actions/workflows/maven.yml/badge.svg)](https://github.com/aaabramov/glogging/actions/workflows/maven.yml)
 
 ---
 
