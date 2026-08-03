@@ -127,7 +127,7 @@ public class GoogleLayout extends PatternLayout {
 
         GcpLoggingEvent e = new GcpLoggingEvent(
                 GcpTimestamp.ofEpoch(event.getTimeStamp()),
-                event.getLevel().levelStr,
+                GcpSeverity.of(event.getLevel()),
                 formattedMessage,
                 labels
         );
