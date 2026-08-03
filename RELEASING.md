@@ -181,8 +181,9 @@ configured at all.
 The library targets Java 8, so some dependencies are pinned deliberately and are
 excluded from Dependabot:
 
-- **JUnit** — 6.x requires Java 17; the 5.11.x line is the last with a Java 8
-  baseline. Major updates ignored.
+- **JUnit** — 6.x requires Java 17, while the whole 5.x line keeps a Java 8
+  baseline. Major updates ignored; minors within 5.x are fine and the JDK 8 job
+  in the build matrix proves it (5.14.4 passes).
 - **logback** — 1.3.x targets JDK 8, while 1.4.x and 1.5.x target JDK 11. The
   break therefore arrives as a **minor** version bump, which is exactly the kind
   of update that gets merged without a second look. Major *and minor* updates
