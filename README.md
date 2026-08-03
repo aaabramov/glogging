@@ -232,6 +232,12 @@ public class MyEncoder implements JsonEncoder {
 Implementations must not throw — a layout that propagates an exception breaks the
 application it is logging for. Report failures in the returned string instead.
 
+## Upgrading
+
+**[docs/UPGRADING.md](docs/UPGRADING.md)** — migration notes for the releases that need
+them. **0.2.0 is a breaking release:** it changes the JSON field names, so Logs Explorer
+queries, log-based metrics and alerting policies built on the old paths need updating.
+
 ## Changelog
 
 See **[CHANGELOG.md](CHANGELOG.md)** — worth a look before upgrading, as it records the

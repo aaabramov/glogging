@@ -18,6 +18,12 @@ release notes on the GitHub Release are auto-generated from commit subjects, so 
 changelog is the only place a behaviour change gets explained to the people it
 affects — 0.1.2 changed the emitted `severity` values, which no PR title conveys.
 
+If the release **breaks anything**, add a section to
+[docs/UPGRADING.md](docs/UPGRADING.md) as well, and link it from the changelog entry.
+Keep it ordered by how likely each change is to go unnoticed: a changed JSON field name
+silently breaks log-based metrics and saved queries with no compile error and no failed
+deploy, so it deserves to come before anything the compiler will catch for the reader.
+
 Then:
 
 ```bash
