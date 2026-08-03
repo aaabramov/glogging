@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       # JDK 11: artifacts stay Java 8 bytecode (maven.compiler.target=1.8), while
       # every release plugin (javadoc, gpg, central-publishing) runs cleanly.
