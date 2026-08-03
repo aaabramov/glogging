@@ -3,7 +3,11 @@ package io.github.aaabramov.glogging;
 import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -72,7 +76,21 @@ public class GoogleLayout extends PatternLayout {
     }
     
     private JsonEncoder jsonEncoder;
-    
+
+    private final List<Label> configuredLabels = new ArrayList<>();
+    private Map<String, String> staticLabels = Collections.emptyMap();
+
+    /**
+     * Adds a label attached to every event. Logback calls this once per {@code <label>}
+     * element in the configuration, before {@link #start()}.
+     *
+     * @param label the configured key/value pair
+     * @since 0.3.0
+     */
+    public void addLabel(Label label) {
+        configuredLabels.add(label);
+    }
+
     @Override
     public void start() {
         super.start();
@@ -83,7 +101,12 @@ public class GoogleLayout extends PatternLayout {
         } else {
             prefix = "";
         }
-        
+
+        // Before the encoder check on purpose: that method returns early when <json> is
+        // missing, and a label misconfiguration should still be reported when the
+        // encoder is broken too.
+        staticLabels = buildStaticLabels();
+
         if (!validateJsonEncoder()) {
             return;
         }
@@ -95,6 +118,29 @@ public class GoogleLayout extends PatternLayout {
         }
     }
     
+    /**
+     * Validates the configured labels and applies the prefix once, at configuration time,
+     * so {@link #doLayout} does no per-event work beyond copying the result.
+     */
+    private Map<String, String> buildStaticLabels() {
+        Map<String, String> resolved = new LinkedHashMap<>();
+        for (Label label : configuredLabels) {
+            String key = label.getKey() == null ? null : label.getKey().trim();
+            if (key == null || key.isEmpty()) {
+                addError("Ignoring <label> with a missing or blank <key>: " + label);
+                continue;
+            }
+            if (label.getValue() == null) {
+                addError("Ignoring <label> with key '" + key + "': missing <value>.");
+                continue;
+            }
+            if (resolved.put(prefix + key, label.getValue()) != null) {
+                addWarn("Duplicate <label> key '" + prefix + key + "'. The last value wins.");
+            }
+        }
+        return resolved;
+    }
+
     private boolean validateJsonEncoder() {
         if (json == null) {
             reportInvalidJsonParam("Missing required 'json' parameter in logback configuration. ");
@@ -118,8 +164,11 @@ public class GoogleLayout extends PatternLayout {
         }
 
         Map<String, String> mdc = event.getMDCPropertyMap();
-        Map<String, String> labels = new HashMap<>(mdc.size() + 1);
+        Map<String, String> labels = new HashMap<>(staticLabels.size() + mdc.size() + 1);
 
+        // Static labels first: MDC is per-event and more specific, so it wins on a
+        // key collision. A fresh copy per event - the shared map must never be mutated.
+        labels.putAll(staticLabels);
         mdc.forEach((k, v) -> labels.put(prefix + k, v));
         if (appendLoggerName) {
             labels.put(prefix + "loggerName", event.getLoggerName());
