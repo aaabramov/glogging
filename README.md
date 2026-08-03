@@ -19,6 +19,26 @@
 
 See [structured logs](https://cloud.google.com/logging/docs/structured-logging).
 
+## Is this the right library for you?
+
+glogging is a **small logback layout that writes structured JSON to stdout** and nothing
+else. It has no opinion on how logs leave the machine: the platform's collector picks them
+up, which is what already happens on GKE, Cloud Run and anywhere the Ops Agent runs.
+
+There are other ways to get structured logs into Cloud Logging, and one of them may suit
+you better:
+
+| | Logging API | Transport | Notes |
+|---|---|---|---|
+| **glogging** | logback | stdout | Two small artifacts; the only third-party dependency is your choice of Gson or Jackson. |
+| [`log4j-layout-template-json`](https://logging.apache.org/log4j/2.x/manual/json-template-layout.html) | Log4j2 | stdout | Ships a `GcpLayout.json` template — verified present in 2.26.1. **If you are on Log4j2, use this**; glogging is logback-only. |
+| [`google-cloud-logging-logback`](https://github.com/googleapis/java-logging-logback) | logback | Logging API | Official. Writes over the network from inside your process, so no collector is needed — useful off-GCP — at the cost of credentials, a large dependency tree, and log delivery sharing fate with your network. Still published as `-alpha` (0.144.0-alpha at the time of writing). |
+| [`logstash-logback-encoder`](https://github.com/logfellow/logstash-logback-encoder) | logback | stdout | Far more featureful — structured arguments, nested payloads, many providers. No GCP template, so you configure the special field names yourself. |
+
+Reach for glogging when you want GCP-shaped stdout logging from logback with as little
+machinery as possible. Reach for one of the others when you need Log4j2, want to skip the
+collector, or need richer structured payloads than `message` plus labels.
+
 ## Getting started
 
 Maven:
