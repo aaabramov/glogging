@@ -1,5 +1,6 @@
 package io.github.aaabramov.glogging;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.StringJoiner;
 
@@ -10,7 +11,15 @@ import java.util.StringJoiner;
  * @since 0.0.1
  */
 class GcpLoggingEvent {
-    
+
+    /**
+     * The collector only promotes labels to {@code LogEntry.labels} under this exact key.
+     * A plain {@code "labels"} object is not a special field: it stays inside
+     * {@code jsonPayload}, where it cannot be used for label-based filtering or log
+     * metrics. Confirmed empirically against a GKE cluster, not just from the docs.
+     */
+    static final String LABELS_KEY = "logging.googleapis.com/labels";
+
     public final GcpTimestamp timestamp;
     public final String severity;
     public final String message;
@@ -28,6 +37,17 @@ class GcpLoggingEvent {
         this.labels = labels;
     }
     
+    Map<String, Object> toJsonMap() {
+        Map<String, Object> json = new LinkedHashMap<>();
+        json.put("timestamp", timestamp);
+        json.put("severity", severity);
+        json.put("message", message);
+        if (!labels.isEmpty()) {
+            json.put(LABELS_KEY, labels);
+        }
+        return json;
+    }
+
     @Override
     public String toString() {
         return new StringJoiner(", ", GcpLoggingEvent.class.getSimpleName() + "[", "]")

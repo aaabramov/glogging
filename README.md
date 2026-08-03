@@ -30,7 +30,7 @@ you better:
 
 | | Logging API | Transport | Notes |
 |---|---|---|---|
-| **glogging** | logback | stdout | Two small artifacts; the only third-party dependency is your choice of Gson or Jackson. |
+| **glogging** | logback | stdout | Two small artifacts; the only third-party dependency is your choice of Gson or Jackson — or neither, if you [supply your own encoder](#custom-json-encoder). |
 | [`log4j-layout-template-json`](https://logging.apache.org/log4j/2.x/manual/json-template-layout.html) | Log4j2 | stdout | Ships a `GcpLayout.json` template — verified present in 2.26.1. **If you are on Log4j2, use this**; glogging is logback-only. |
 | [`google-cloud-logging-logback`](https://github.com/googleapis/java-logging-logback) | logback | Logging API | Official. Writes over the network from inside your process, so no collector is needed — useful off-GCP — at the cost of credentials, a large dependency tree, and log delivery sharing fate with your network. Still published as `-alpha` (0.144.0-alpha at the time of writing). |
 | [`logstash-logback-encoder`](https://github.com/logfellow/logstash-logback-encoder) | logback | stdout | Far more featureful — structured arguments, nested payloads, many providers. No GCP template, so you configure the special field names yourself. |
@@ -107,7 +107,8 @@ libraryDependencies ++= Seq(
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
             <layout class="io.github.aaabramov.glogging.GoogleLayout">
 
-                <!-- You have a choice which JSON encoder to use. Or create your own via implementing JsonEncoder interface -->
+                <!-- Which JSON encoder to use. You can also supply your own by
+                     implementing the JsonEncoder interface (see below). -->
                 <json>io.github.aaabramov.glogging.JacksonEncoder</json>
 
                 <!-- OR -->
@@ -142,14 +143,52 @@ libraryDependencies ++= Seq(
 ## Example output:
 
 ```
-{"timestamp":{"seconds":1629642099,"nanos":659000000},"severity":"DEBUG","message":"debug","labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
-{"timestamp":{"seconds":1629642099,"nanos":659000000},"severity":"INFO","message":"info","labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
-{"timestamp":{"seconds":1629642099,"nanos":659000000},"severity":"WARNING","message":"warn","labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
-{"timestamp":{"seconds":1629642099,"nanos":661000000},"severity":"ERROR","message":"error java.lang.RuntimeException: BOOM\n\tat io.github.aaabramov.glogging.App.main(App.java:22)","labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
-{"timestamp":{"seconds":1629642102,"nanos":661000000},"severity":"DEBUG","message":"debug","labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
-{"timestamp":{"seconds":1629642102,"nanos":661000000},"severity":"INFO","message":"info","labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
-{"timestamp":{"seconds":1629642102,"nanos":661000000},"severity":"WARNING","message":"warn","labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
-{"timestamp":{"seconds":1629642102,"nanos":661000000},"severity":"ERROR","message":"error","labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
+{"timestamp":{"seconds":1629642099,"nanos":659000000},"severity":"DEBUG","message":"debug","logging.googleapis.com/labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
+{"timestamp":{"seconds":1629642099,"nanos":659000000},"severity":"INFO","message":"info","logging.googleapis.com/labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
+{"timestamp":{"seconds":1629642099,"nanos":659000000},"severity":"WARNING","message":"warn","logging.googleapis.com/labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
+{"timestamp":{"seconds":1629642099,"nanos":661000000},"severity":"ERROR","message":"error java.lang.RuntimeException: BOOM\n\tat io.github.aaabramov.glogging.App.main(App.java:22)","logging.googleapis.com/labels":{"io.github.aaabramov/name":"Andrii","io.github.aaabramov/loggerName":"io.github.aaabramov.glogging.App"}}
+```
+
+## Labels
+
+MDC entries become **`LogEntry.labels`**, which is what makes them usable for filtering
+and log-based metrics. They are emitted under the special
+`logging.googleapis.com/labels` key — the only key Cloud Logging promotes; a plain
+`labels` object would stay buried in the payload instead.
+
+Given `MDC.put("userId", "42")` and `<prefix>com.yourcompany</prefix>`, filter in the
+Logs Explorer with:
+
+```
+labels."com.yourcompany/userId"="42"
+```
+
+Because every field glogging emits is a field Cloud Logging recognises, the entry has no
+`jsonPayload` at all — the message lands in `textPayload`. Anything you added to the
+message via `<pattern>`, including `%xException`, is preserved there, so Error Reporting
+continues to pick up stack traces.
+
+> **Changed in 0.2.0.** Earlier versions emitted a plain `labels` object, which was never
+> promoted, so labels were only reachable as `jsonPayload.labels.*` and the message as
+> `jsonPayload.message`. See [CHANGELOG.md](CHANGELOG.md) if you are upgrading.
+
+### If your message is itself JSON
+
+It stays a **string**. The message is escaped into the `message` field, so the envelope
+is never corrupted and the text comes back byte-identical — but Cloud Logging does not
+parse it, even when the message is nothing but JSON. You can substring-search it:
+
+```
+textPayload:"orderId"          # matches
+textPayload.orderId="A-77"     # ERROR: Field not found: 'orderId'
+```
+
+That is not a regression — before 0.2.0 the message was a string in
+`jsonPayload.message` and equally unparsed; only the field name changed. If you want a
+value to be *queryable*, put it in the MDC so it becomes a label:
+
+```java
+MDC.put("orderId", "A-77");            // -> labels."com.yourcompany/orderId"="A-77"
 ```
 
 ## Severity mapping
@@ -168,6 +207,30 @@ names Cloud Logging defines, which are not spelled quite the same:
 
 `NOTICE`, `CRITICAL`, `ALERT` and `EMERGENCY` are never emitted — logback tops out at
 `ERROR`.
+
+## Custom JSON encoder
+
+If you would rather not add Gson or Jackson, implement `JsonEncoder` yourself and point
+`<json>` at your class. It receives the event as a `Map` whose keys are already the exact
+field names Cloud Logging expects, so write them out **verbatim** — no naming strategy,
+and nothing that treats `.` as a path separator:
+
+```java
+package com.yourcompany;
+
+import io.github.aaabramov.glogging.JsonEncoder;
+import java.util.Map;
+
+public class MyEncoder implements JsonEncoder {
+    @Override
+    public String toJson(Map<String, Object> event) {
+        return yourJsonLibrary.write(event); // no trailing newline
+    }
+}
+```
+
+Implementations must not throw — a layout that propagates an exception breaks the
+application it is logging for. Report failures in the returned string instead.
 
 ## Changelog
 
