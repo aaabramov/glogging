@@ -153,4 +153,59 @@ class StaticLabelsConfigTest {
             System.clearProperty("glogging.test.revision");
         }
     }
+
+    @Test
+    void anMdcEntryOverridesAStaticLabelOnTheSameKey() {
+        LogbackFixture fixture = LogbackFixture.withLayout(
+                "<prefix>com.acme</prefix>\n"
+                        + "<label><key>tenant</key><value>default</value></label>\n");
+
+        fixture.mdc("tenant", "acme-corp");
+        fixture.log("hello");
+
+        assertEquals("acme-corp", fixture.labels().get("com.acme/tenant"),
+                "per-event MDC data is more specific than a deployment constant");
+    }
+
+    @Test
+    void staticLabelsAreEmittedEvenWithAnEmptyMdc() {
+        LogbackFixture fixture = LogbackFixture.withLayout(
+                "<label><key>serviceName</key><value>checkout</value></label>\n");
+
+        fixture.log("hello");
+
+        assertTrue(fixture.lastEvent().containsKey(LogbackFixture.LABELS),
+                "static labels alone are enough to emit the labels key");
+    }
+
+    @Test
+    void staticLabelsCoexistWithAppendLoggerName() {
+        LogbackFixture fixture = LogbackFixture.withLayout(
+                "<prefix>com.acme</prefix>\n"
+                        + "<appendLoggerName>true</appendLoggerName>\n"
+                        + "<label><key>serviceName</key><value>checkout</value></label>\n");
+
+        fixture.log("hello");
+
+        assertEquals("checkout", fixture.labels().get("com.acme/serviceName"));
+        assertEquals("com.example.Foo", fixture.labels().get("com.acme/loggerName"));
+    }
+
+    @Test
+    void mdcFromOneEventDoesNotLeakIntoTheNext() {
+        // Guards the defensive copy in doLayout. If the shared staticLabels map were
+        // mutated instead of copied, event two would still carry event one's MDC.
+        LogbackFixture fixture = LogbackFixture.withLayout(
+                "<label><key>serviceName</key><value>checkout</value></label>\n");
+
+        fixture.mdc("requestId", "req-1");
+        fixture.log("first");
+        fixture.clearMdc();
+        fixture.log("second");
+
+        assertEquals("checkout", fixture.labels().get("serviceName"),
+                "the static label must survive both events");
+        assertFalse(fixture.labels().containsKey("requestId"),
+                "the first event's MDC must not leak into the second");
+    }
 }
