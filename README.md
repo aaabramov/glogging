@@ -172,6 +172,25 @@ continues to pick up stack traces.
 > promoted, so labels were only reachable as `jsonPayload.labels.*` and the message as
 > `jsonPayload.message`. See [CHANGELOG.md](CHANGELOG.md) if you are upgrading.
 
+### If your message is itself JSON
+
+It stays a **string**. The message is escaped into the `message` field, so the envelope
+is never corrupted and the text comes back byte-identical — but Cloud Logging does not
+parse it, even when the message is nothing but JSON. You can substring-search it:
+
+```
+textPayload:"orderId"          # matches
+textPayload.orderId="A-77"     # ERROR: Field not found: 'orderId'
+```
+
+That is not a regression — before 0.2.0 the message was a string in
+`jsonPayload.message` and equally unparsed; only the field name changed. If you want a
+value to be *queryable*, put it in the MDC so it becomes a label:
+
+```java
+MDC.put("orderId", "A-77");            // -> labels."com.yourcompany/orderId"="A-77"
+```
+
 ## Severity mapping
 
 logback levels are translated to the

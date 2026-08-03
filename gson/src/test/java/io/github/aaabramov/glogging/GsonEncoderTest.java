@@ -96,6 +96,34 @@ class GsonEncoderTest {
     }
 
     @Test
+    void aMessageThatIsItselfJsonSurvivesAsAString() {
+        // Applications do log JSON. It must be escaped into the message string rather
+        // than corrupting the envelope, and must come back out byte-identical.
+        String userJson = "{\"orderId\":\"A-77\",\"total\":12.5,\"tags\":[\"x\",\"y\"]}";
+        GcpLoggingEvent event = new GcpLoggingEvent(
+                GcpTimestamp.ofEpoch(1629642099659L), "INFO", userJson, labels());
+
+        JsonObject json = JsonParser.parseString(encoder.toJson(event.toJsonMap())).getAsJsonObject();
+
+        assertEquals(userJson, json.get("message").getAsString());
+        // The envelope must not have gained the user's keys as fields of its own.
+        assertFalse(json.has("orderId"));
+    }
+
+    @Test
+    void aMessageWithNewlinesAndQuotesStaysOnOneLine() {
+        // Stack traces arrive here via %xException.
+        String message = "boom \"quoted\"\n\tat com.example.Foo.bar(Foo.java:1)";
+        GcpLoggingEvent event = new GcpLoggingEvent(
+                GcpTimestamp.ofEpoch(1629642099659L), "ERROR", message, labels());
+
+        String out = encoder.toJson(event.toJsonMap());
+
+        assertEquals(-1, out.indexOf('\n'), "a raw newline would split one event into two log lines");
+        assertEquals(message, JsonParser.parseString(out).getAsJsonObject().get("message").getAsString());
+    }
+
+    @Test
     void emitsCamelCaseFieldNamesAndNoTrailingNewline() {
         String json = encode(labels());
 
