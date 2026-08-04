@@ -1,0 +1,53 @@
+# Checks the commit messages on a pull request.
+#
+# The .githooks/commit-msg hook only runs for someone who has opted into it with
+# `git config core.hooksPath .githooks`, so it cannot bind a contributor. This job
+# is the enforcement: it runs the very same hook script over every commit the PR
+# adds, so the pattern list has exactly one home and the two can never drift.
+
+name: Commit messages
+
+on:
+  pull_request:
+    branches: [ master ]
+
+# Least privilege: reads the tree and nothing else.
+permissions:
+  contents: read
+
+jobs:
+  attribution:
+    runs-on: ubuntu-latest
+    name: No AI attribution
+
+    steps:
+      # Full history: the job needs both endpoints of the PR range, and the
+      # default shallow fetch has neither.
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Reject AI attribution in commit messages
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -eu
+
+          failed=0
+          for sha in $(git rev-list "${BASE_SHA}..${HEAD_SHA}"); do
+            git log -1 --format=%B "$sha" > commit-message.txt
+            if ! .githooks/commit-msg commit-message.txt; then
+              echo "  ...in commit $sha ($(git log -1 --format=%s "$sha"))" >&2
+              failed=1
+            fi
+          done
+          rm -f commit-message.txt
+
+          if [ "$failed" -ne 0 ]; then
+            echo >&2
+            echo "Rewrite the offending messages (git rebase -i) and force-push." >&2
+            exit 1
+          fi
+
+          echo "All commit messages are clean."
