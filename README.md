@@ -32,7 +32,7 @@ you better:
 |---|---|---|---|
 | **glogging** | logback | stdout | Two small artifacts; the only third-party dependency is your choice of Gson or Jackson — or neither, if you [supply your own encoder](#custom-json-encoder). |
 | [`log4j-layout-template-json`](https://logging.apache.org/log4j/2.x/manual/json-template-layout.html) | Log4j2 | stdout | Ships a `GcpLayout.json` template — verified present in 2.26.1. **If you are on Log4j2, use this**; glogging is logback-only. |
-| [`google-cloud-logging-logback`](https://github.com/googleapis/java-logging-logback) | logback | Logging API | Official. Writes over the network from inside your process, so no collector is needed — useful off-GCP — at the cost of credentials, a large dependency tree, and log delivery sharing fate with your network. Still published as `-alpha` (0.144.0-alpha at the time of writing). |
+| [`google-cloud-logging-logback`](https://github.com/googleapis/google-cloud-java/tree/main/java-logging-logback) | logback | Logging API | Official; it lives in the `google-cloud-java` monorepo, and the standalone `java-logging-logback` repo is archived — releases continue from the monorepo. Writes over the network from inside your process, so no collector is needed — useful off-GCP — at the cost of credentials, a large dependency tree, and log delivery sharing fate with your network. Still published as `-alpha` (0.144.0-alpha at the time of writing). |
 | [`logstash-logback-encoder`](https://github.com/logfellow/logstash-logback-encoder) | logback | stdout | Far more featureful — structured arguments, nested payloads, many providers. No GCP template, so you configure the special field names yourself. |
 
 Reach for glogging when you want GCP-shaped stdout logging from logback with as little
