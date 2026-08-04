@@ -1,0 +1,43 @@
+#!/bin/sh
+#
+# Rejects AI-tooling attribution in commit messages.
+#
+# Git history here is authored by a person; which editor or assistant helped
+# write a patch is not part of the record, and on a public repository it is
+# permanent and visible to everyone.
+#
+# This file is the single home of the pattern list. The `Commit messages`
+# workflow runs this same script over every commit a pull request adds, which
+# is what actually enforces the rule — a git hook only runs for someone who
+# opted into it. Installing it locally is a convenience: you find out at commit
+# time instead of after a red CI run.
+#
+# Enable once per clone (optional):
+#
+#     git config core.hooksPath .githooks
+#
+# Bypass for a single commit, if you ever genuinely need to:
+#
+#     git commit --no-verify
+#
+set -eu
+
+msg_file="$1"
+
+# Strip comment lines so a commented-out example never trips the check.
+subject_and_body=$(grep -v '^#' "$msg_file" || true)
+
+matches=$(printf '%s\n' "$subject_and_body" | grep -n -i -E \
+    'Claude-Session:|Co-Authored-By:[[:space:]]*Claude|Generated with[[:space:]]+.*Claude|noreply@anthropic\.com' || true)
+
+if [ -n "$matches" ]; then
+    printf '%s\n' "commit-msg: refusing to commit AI attribution." >&2
+    printf '%s\n' "" >&2
+    printf '%s\n' "$matches" | sed 's/^/  /' >&2
+    printf '%s\n' "" >&2
+    printf '%s\n' "Remove the line(s) above and commit again." >&2
+    printf '%s\n' "If Claude Code added it, set attribution.sessionUrl to false in" >&2
+    printf '%s\n' "~/.claude/settings.json to stop it at the source." >&2
+    printf '%s\n' "To bypass a single commit: git commit --no-verify" >&2
+    exit 1
+fi
