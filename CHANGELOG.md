@@ -9,7 +9,7 @@ single version, so one entry covers them all.
 
 ## Unreleased
 
-## 0.3.0
+## 0.3.0 — 2026-08-04
 
 ### Added
 
@@ -37,7 +37,7 @@ single version, so one entry covers them all.
   A `<label>` missing its key or value is reported on logback's status output and
   skipped; it never stops the application logging. Note that logback trims element text
   and collapses `<value></value>` to nothing, so an empty value is rejected in the same
-  way a missing one is.
+  way a missing one is. ([#26])
 
 **Nothing changes for existing configurations.** A layout with no `<label>` elements
 emits byte-identical output to 0.2.0, and no encoder was modified — static labels are
@@ -209,3 +209,4 @@ whole migration in one place; each entry below also carries its own action-requi
 [#22]: https://github.com/aaabramov/glogging/pull/22
 [#23]: https://github.com/aaabramov/glogging/pull/23
 [#24]: https://github.com/aaabramov/glogging/pull/24
+[#26]: https://github.com/aaabramov/glogging/pull/26
