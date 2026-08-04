@@ -51,6 +51,21 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!--
+            The Java 8 baseline. These two are only the fallback for building ON
+            JDK 8, which has no `release` compiler option; every newer JDK takes
+            the `maven.compiler.release` route in the jdk9plus profile below, and
+            `release` wins over these when both are set.
+
+            Why that matters: `-source` and `-target` set the bytecode level but
+            still compile against the *running* JDK's class library, so calling
+            an API that does not exist on Java 8 compiles cleanly, produces a
+            class file stamped major 52, and then throws NoSuchMethodError on a
+            real Java 8 JVM. javac says so itself - "not setting the bootstrap
+            class path may lead to class files that cannot run on JDK 8". The
+            `release` option sets the bootstrap class path, so the same code is
+            rejected at compile time instead.
+        -->
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <!--
@@ -169,6 +184,31 @@
     </build>
 
     <profiles>
+        <!--
+            Compile against the Java 8 *class library*, not merely down to Java 8
+            bytecode. See the note on maven.compiler.source above for what
+            -source and -target alone fail to catch.
+
+            Conditional on the JDK because the `release` option arrived in JDK 9,
+            so passing it on the JDK 8 matrix leg would fail the build outright.
+            That leg needs no protection anyway: its class library IS Java 8.
+            Once the baseline moves off 8 (see IMPROVEMENTS decision 0.1) this
+            profile collapses into a plain maven.compiler.release property.
+
+            Verified by mutation, not by reading: adding a `String.isBlank()`
+            call (Java 11) to core makes `mvn verify` fail on JDK 9+ with
+            "cannot find symbol", where it compiled silently before this change.
+        -->
+        <profile>
+            <id>jdk9plus</id>
+            <activation>
+                <jdk>[9,)</jdk>
+            </activation>
+            <properties>
+                <maven.compiler.release>8</maven.compiler.release>
+            </properties>
+        </profile>
+
         <!--
             Release profile: activate with `mvn -Prelease deploy`.
             Kept out of the default build so ordinary CI `mvn package` runs
