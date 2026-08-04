@@ -34,10 +34,24 @@ jobs:
         run: |
           set -eu
 
+          # Name every commit examined. A green check over an *empty* range looks
+          # identical to a green check that inspected everything, so the count is
+          # the only thing distinguishing "clean" from "silently checked nothing".
+          revs=$(git rev-list "${BASE_SHA}..${HEAD_SHA}")
+          count=$(printf '%s' "$revs" | grep -c . || true)
+          echo "Checking $count commit(s) in ${BASE_SHA}..${HEAD_SHA}"
+
+          if [ "$count" -eq 0 ]; then
+            echo "No commits in range - the range endpoints are wrong." >&2
+            exit 1
+          fi
+
           failed=0
-          for sha in $(git rev-list "${BASE_SHA}..${HEAD_SHA}"); do
+          for sha in $revs; do
             git log -1 --format=%B "$sha" > commit-message.txt
-            if ! .githooks/commit-msg commit-message.txt; then
+            if .githooks/commit-msg commit-message.txt; then
+              echo "  ok    $(git log -1 --format='%h %s' "$sha")"
+            else
               echo "  ...in commit $sha ($(git log -1 --format=%s "$sha"))" >&2
               failed=1
             fi
@@ -50,4 +64,4 @@ jobs:
             exit 1
           fi
 
-          echo "All commit messages are clean."
+          echo "All $count commit message(s) are clean."
