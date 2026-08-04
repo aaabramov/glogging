@@ -120,6 +120,17 @@ libraryDependencies ++= Seq(
                 <!-- Optionally configure prefix for labels -->
                 <prefix>com.yourcompany</prefix>
 
+                <!-- Labels attached to every log line. Values go through logback's
+                     ${...} substitution, so they can come from the environment. -->
+                <label>
+                    <key>serviceName</key>
+                    <value>checkout</value>
+                </label>
+                <label>
+                    <key>version</key>
+                    <value>${APP_VERSION}</value>
+                </label>
+
                 <!-- Provide message pattern you like. -->
                 <!-- Note: there is no need anymore to log timestamps & levels to the message. Google will pick them up from specific fields. -->
                 <pattern>%message %xException{10}</pattern>
@@ -171,6 +182,40 @@ continues to pick up stack traces.
 > **Changed in 0.2.0.** Earlier versions emitted a plain `labels` object, which was never
 > promoted, so labels were only reachable as `jsonPayload.labels.*` and the message as
 > `jsonPayload.message`. See [CHANGELOG.md](CHANGELOG.md) if you are upgrading.
+
+### Labels that are the same on every line
+
+Service name, version and region do not belong in the MDC — they never change for the
+life of the process, and putting them there means setting them on every thread that
+logs. Declare them on the layout instead:
+
+```xml
+<label>
+    <key>serviceName</key>
+    <value>checkout</value>
+</label>
+<label>
+    <key>version</key>
+    <value>${APP_VERSION}</value>
+</label>
+```
+
+`<prefix>` applies to these exactly as it does to MDC keys, so with
+`<prefix>com.yourcompany</prefix>` the example above is filtered as
+`labels."com.yourcompany/serviceName"="checkout"`.
+
+Values are substituted by logback before glogging sees them, so anything logback can
+resolve works — `${K_REVISION}` on Cloud Run, `${HOSTNAME}` on GKE, or a system property.
+
+If an MDC entry and a static label collide on the same key, **the MDC value wins**: a
+static label is a default for the deployment, and per-event data is more specific.
+
+A `<label>` needs both a key and a non-empty value. Logback trims element text and
+collapses an empty `<value></value>` to nothing, so a label missing either one is
+reported on logback's status output and skipped — it never stops the application
+logging.
+
+*Added in 0.3.0.*
 
 ### If your message is itself JSON
 

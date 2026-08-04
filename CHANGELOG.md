@@ -9,6 +9,40 @@ single version, so one entry covers them all.
 
 ## Unreleased
 
+## 0.3.0
+
+### Added
+
+- **Static labels from configuration.** Repeated `<label>` elements on the layout attach
+  labels to every log line, so deployment constants such as service name, version and
+  region no longer have to be pushed into the MDC by hand on every thread that logs:
+
+  ```xml
+  <label>
+      <key>serviceName</key>
+      <value>checkout</value>
+  </label>
+  <label>
+      <key>version</key>
+      <value>${APP_VERSION}</value>
+  </label>
+  ```
+
+  Values go through logback's `${...}` substitution before glogging sees them, so
+  environment-derived labels — `${K_REVISION}` on Cloud Run, `${HOSTNAME}` on GKE — work
+  with no extra support. `<prefix>` applies to them exactly as it does to MDC keys, and
+  an MDC entry overrides a static label on a key collision, since per-event data is more
+  specific than a deployment default.
+
+  A `<label>` missing its key or value is reported on logback's status output and
+  skipped; it never stops the application logging. Note that logback trims element text
+  and collapses `<value></value>` to nothing, so an empty value is rejected in the same
+  way a missing one is.
+
+**Nothing changes for existing configurations.** A layout with no `<label>` elements
+emits byte-identical output to 0.2.0, and no encoder was modified — static labels are
+additional entries in the `logging.googleapis.com/labels` object that already exists.
+
 ## 0.2.0 — 2026-08-04
 
 **Breaking.** Changes the emitted JSON, the `JsonEncoder` interface, and what glogging
