@@ -19,19 +19,30 @@ mvn -B verify
 That runs the whole reactor: `core`, `gson`, `jackson`. Any JDK from 8 upwards builds it —
 CI runs the matrix **8, 11, 17, 21** and all four must pass.
 
-## The Java 8 baseline is easy to break without noticing
+## The Java 8 baseline, and how the build enforces it
 
-The library targets Java 8 (`maven.compiler.source`/`target` in `pom.xml`). Those flags set
-the *bytecode* level but still compile against the **current JDK's class library**, so
-nothing stops you calling a method that does not exist on Java 8. It compiles, it ships, and
-it fails at runtime for anyone actually on 8.
+The library targets Java 8, and the build compiles against the Java 8 **class library** —
+not merely down to Java 8 bytecode. So if you reach for an API that does not exist on 8,
+compilation fails immediately:
 
-The JDK 8 leg of the CI matrix is what catches this, so **don't ignore a failure that only
-appears there** — it is the one job testing the thing the build cannot check locally.
+```
+Label.java:[28,31] cannot find symbol
+  symbol: method isBlank()
+```
 
-Two dependencies are pinned for the same reason and excluded from Dependabot: JUnit stays on
-5.x (6.x needs Java 17) and logback on 1.3.x (1.4+ needs Java 11). Please don't bump either
-in a PR.
+If you see that for a method your IDE happily autocompletes, you have used something newer
+than Java 8. That is the guard working, not a broken build.
+
+This is worth knowing because it is *not* what `-source`/`-target` alone do. Those set the
+bytecode level but still compile against the **running** JDK's class library, so the same
+call would compile cleanly, land in a class file stamped Java 8, and only fail with
+`NoSuchMethodError` on someone else's Java 8 JVM. `maven.compiler.release` closes that, and
+`pom.xml` applies it through a `jdk9plus` profile — the option needs JDK 9+, and on JDK 8
+itself the class library is already the right one.
+
+Two dependencies are pinned for the same baseline and excluded from Dependabot: JUnit stays
+on 5.x (6.x needs Java 17) and logback on 1.3.x (1.4+ needs Java 11). Please don't bump
+either in a PR.
 
 ## Configuration must be tested through real logback XML
 
