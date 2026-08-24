@@ -14,7 +14,7 @@
     <name>jackson</name>
 
     <properties>
-        <version.jackson>2.22.1</version.jackson>
+        <version.jackson>2.22.2</version.jackson>
         <!-- Stable JPMS module name; see the note in core/pom.xml. -->
         <module.name>io.github.aaabramov.glogging.jackson</module.name>
     </properties>
