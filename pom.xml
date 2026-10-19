@@ -155,10 +155,10 @@
                         Keep this current. The Portal API adds response fields over
                         time and the plugin deserializes them strictly, so an old
                         plugin fails *after* the bundle has already been accepted:
-                        0.7.0 died on Unrecognized field "warnings", which 0.11.0
+                        0.7.0 died on Unrecognized field "warnings", which 0.12.0
                         added to DeploymentApiResponse.
                     -->
-                    <version>0.11.0</version>
+                    <version>0.12.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
